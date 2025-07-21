@@ -16,7 +16,7 @@ html {
 }
 
 body {
-	max-width: 740px;
+	max-width: 640px;
 	margin: 0 auto;
 	text-align: justify;
 }
@@ -241,17 +241,14 @@ li {
 /* Footer */
 footer {
 	margin: 4rem 0;
+	cursor: default;
+	list-style: none;
+	padding: 0;
 }
 
 .footer__link {
 	color: var(--text-link);
 	text-decoration: none;
-}
-
-.footer {
-	cursor: default;
-	list-style: none;
-	padding: 0;
 }
 
 .icon__btn {
@@ -308,7 +305,7 @@ footer {
 }
 
 /* Media Query */
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 700px) {
 	body {
 		width: 350px;
 	}
