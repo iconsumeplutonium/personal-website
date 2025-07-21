@@ -9,10 +9,6 @@ const allProjects = await getCollection("projects");
 	<ul role="list" class="link-card-grid">
 		{
 			allProjects.map((card) => {
-				// let links = card.data.links.map((site) => {
-				// 	return { name: site.name, url: site.url };
-				// });
-
 				return (
 					<Card
 						url={`/projects/${card.id}/`}

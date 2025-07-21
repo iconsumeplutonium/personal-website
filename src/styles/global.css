@@ -106,7 +106,7 @@ li {
 	border-radius: 6px;
 	font-family: var(--body);
 	font-weight: 600;
-	font-size: .85rem;
+	font-size: .75rem;
 	padding: 0.3em 0.6em 0.2em;
 }
 
@@ -158,6 +158,10 @@ li {
 	align-items: flex-start;
 }
 
+.card__link:hover {
+	transform: scale(1.05);
+}
+
 .card__img {
 	border-radius: 16px;
 	max-width: 100%;
@@ -185,9 +189,6 @@ li {
 	margin: 0.5rem 0 0;
 }
 
-.card__link:hover {
-	transform: scale(1.05);
-}
 
 .card__content {
 	flex: 1;
@@ -408,4 +409,25 @@ html.light {
 		height: auto;
 		width: 350px;
 	}
+
+	/* Card mobile layout */
+    .card__link {
+        flex-direction: column;
+    }
+
+    .card__image_div {
+        flex: none;
+        padding-right: 0;
+        padding-bottom: 1rem;
+        width: 100%;
+    }
+
+    .card__img {
+        width: 100%;
+        height: auto;
+    }
+
+    .card__content {
+        width: 100%;
+    }
 }
