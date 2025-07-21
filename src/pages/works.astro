@@ -2,21 +2,28 @@
 import { getCollection } from "astro:content";
 import Card from "../components/Card.astro";
 const allProjects = await getCollection("projects");
-const pageTitle = "Works";
 ---
 
 <div>
 	<h2>Projects</h2>
 	<ul role="list" class="link-card-grid">
 		{
-			allProjects.map((card) => (
-				<Card
-					url={`/projects/${card.id}/`}
-					image={card.data.image.url}
-					title={card.data.title}
-					body={card.data.description}
-				/>
-			))
+			allProjects.map((card) => {
+				// let links = card.data.links.map((site) => {
+				// 	return { name: site.name, url: site.url };
+				// });
+
+				return (
+					<Card
+						url={`/projects/${card.id}/`}
+						image={card.data.image.url}
+						title={card.data.title}
+						body={card.data.description}
+						stack={card.data.stack}
+						links={card.data.links}
+					/>
+				);
+			})
 		}
 	</ul>
 </div>

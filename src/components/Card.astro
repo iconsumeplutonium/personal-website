@@ -1,34 +1,46 @@
 ---
+interface Link {
+	name: string;
+	url: string;
+}
 interface Props {
 	url: string;
 	image: string;
 	title: string;
 	body: string;
+	stack: string;
+	links: Link[];
 }
 
-const { url, image, title, body } = Astro.props;
+const { url, image, title, body, stack, links } = Astro.props;
 ---
 
 <li class="card">
-	<a class="card__link" href={url}>
+	<div class="card__link">
 		<div class="card__image_div">
 			<img
 				class="card__img"
 				src={image}
 				role="presentation"
-				width="226"
-				height="127"
+				width="300"
+				height="169"
 				loading="lazy"
 				decoding="async"
 			/>
 		</div>
-		<div class="card__content" style="flex: 2;">
+		<div class="card__content">
 			<h3 class="card__title">
 				{title}
 			</h3>
+			<!-- <div style="display: flex; flex-direction: row;">
+				{stack.split(", ").map((s) => <span class="badge">{s}</span>)}
+			</div> -->
 			<p class="card__txt">
 				{body}
 			</p>
+			<div style="display: flex; flex-direction: row;">
+				{links.map((l) => <a href={l.url}>{l.name}</a>)}
+			</div>
 		</div>
-	</a>
+	</div>
 </li>
