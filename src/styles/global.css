@@ -1,12 +1,9 @@
 /* Global styles */
 :root {
 	--background: #1e1e2e;
-	--background-light: #fcebf3;
 	--button: #78c2ad;
 	--text: #eff1f5;
-	--text-light: #1e1e2e;
 	--text-link: #78c2ad;
-	--text-link-light: #375a7f;
 	--underline: #375a7f;
 	--header: 'Josefin Sans',sans-serif;
 	--body: 'Josefin Sans', sans-serif;
@@ -308,68 +305,6 @@ footer {
 .lost__link {
 	color: var(--text-link);
 	text-decoration: none;
-}
-
-/* Theme Icon */
-html.light {
-	background-color: var(--background-light);
-	color: var(--text-light);
-}
-
-.light .navbar__title>a {
-	color: var(--text-light);
-}
-
-.light .navbar__menu>a {
-	color: var(--text-light);
-}
-
-.light .card__title {
-	color: var(--text-light);
-}
-
-.light .card__txt {
-	color: var(--text-light);
-}
-
-.light .btn {
-	color: var(--text-light);
-}
-
-.light .btn:hover {
-	color: var(--text);
-}
-
-.light .icon__link {
-	border: 2px solid var(--text-light);
-}
-
-.light .icon__link:hover {
-	border-color: var(--text-link);
-}
-
-.light .git-icon {
-	content: url("/images/github-mark.svg");
-}
-
-.light .mail-icon {
-	content: url("/images/mail.svg");
-}
-
-.light .linked-in {
-	content: url("/images/li-in.png");
-}
-
-.light .badge__link {
-	color: var(--text-link-light);
-}
-
-.light .footer__link {
-	color: var(--text-link-light);
-}
-
-.light .icon__link:hover {
-	border-color: var(--text-link-light);
 }
 
 /* Media Query */
