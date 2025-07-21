@@ -8,8 +8,9 @@
 	--text-link: #78c2ad;
 	--text-link-light: #375a7f;
 	--underline: #375a7f;
-	--header: 'Pacifico', cursive;
+	--header: 'Josefin Sans',sans-serif;
 	--body: 'Josefin Sans', sans-serif;
+	/* font-family: system-ui, Avenir, Helvetica, Arial, sans-serif; */
 }
 
 html {
@@ -18,7 +19,7 @@ html {
 }
 
 body {
-	max-width: 540px;
+	max-width: 740px;
 	margin: 0 auto;
 	text-align: justify;
 }
@@ -141,6 +142,8 @@ li {
 	display: flex;
 	background-size: 400%;
 	padding: 20px;
+	display: flex;
+	align-items: center;
 }
 
 .card__link {
@@ -149,10 +152,21 @@ li {
 	line-height: 1.4;
 	border-radius: 8px;
 	color: var(--text);
+
+	display: flex; 
+	text-decoration: none; 
+	color: inherit;
 }
 
 .card__img {
 	border-radius: 16px;
+	max-width: 100%;
+	height: auto;
+}
+
+.card__image_div {
+	flex: 1; 
+	padding-right: 1rem;
 }
 
 .card__title {
@@ -176,7 +190,7 @@ li {
 }
 
 .link-card-grid {
-	display: grid;
+	display: list;
 	grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
 	gap: 1rem;
 	padding: 0;
