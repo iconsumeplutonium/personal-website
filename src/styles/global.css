@@ -239,11 +239,20 @@ li {
 }
 
 /* Footer */
-footer {
-	margin: 4rem 0;
+.buttonWithLinks {
+	margin: 0;
 	cursor: default;
 	list-style: none;
 	padding: 0;
+	margin: 0;
+}
+
+.header-buttons {
+	display: block;
+}
+
+.footer-buttons {
+	display: none;
 }
 
 .footer__link {
@@ -253,7 +262,8 @@ footer {
 
 .icon__btn {
 	display: inline-block;
-	padding: 0 0.5rem;
+	padding: 0 0.1rem;
+	margin: 0;
 }
 
 .icon__link {
@@ -362,4 +372,12 @@ footer {
     .card__content {
         width: 100%;
     }
+
+	.header-buttons {
+		display: none;
+	}
+
+	.footer-buttons {
+		display: block;
+	}
 }
