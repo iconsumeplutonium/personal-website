@@ -291,28 +291,7 @@ li {
 	content: url("/images/li-in-white.png");
 }
 
-/* 404 */
-.lost {
-	margin-top: 30%;
-	text-align: center;
-}
 
-.lost__header {
-	margin: 0 auto;
-	text-align: center;
-	border: 0;
-	font-size: 7.5rem;
-	letter-spacing: 10px;
-}
-
-.lost__body {
-	color: #5C5B77;
-}
-
-.lost__link {
-	color: var(--text-link);
-	text-decoration: none;
-}
 
 /* Media Query */
 @media only screen and (max-width: 700px) {
