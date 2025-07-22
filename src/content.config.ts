@@ -10,12 +10,11 @@ const projectsCollection = defineCollection({
 			url: z.string(),
 			alt: z.string()
 		}),
-		platform: z.string(),
 		stack: z.string(),
 		links: z.array(z.object({
             name: z.string(),
             url: z.string()
-        })),
+        })).optional(),
 		order: z.number()
 	})
 });

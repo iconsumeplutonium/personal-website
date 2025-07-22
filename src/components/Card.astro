@@ -9,7 +9,7 @@ interface Props {
 	title: string;
 	body: string;
 	stack: string;
-	links: Link[];
+	links?: Link[];
 }
 
 const { url, image, title, body, stack, links } = Astro.props;
@@ -39,7 +39,7 @@ const { url, image, title, body, stack, links } = Astro.props;
 				{body}
 			</p>
 			<div style="display: flex; flex-direction: row;">
-				{links.map((l) => <a href={l.url} style="padding-right: 5px;">{l.name}</a>)}
+				{links && links.map((l) => <a href={l.url} style="padding-right: 10px; color: #61dafb">{l.name}</a>)}
 			</div>
 		</div>
 	</div>
