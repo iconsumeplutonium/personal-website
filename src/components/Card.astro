@@ -29,10 +29,10 @@ const { url, image, title, body, stack, links } = Astro.props;
 			/>
 		</div>
 		<div class="card__content">
-			<h3 class="card__title">
+			<h3 class="card__title" style="margin-bottom: -0.6rem;">
 				{title}
 			</h3>
-			<div style="display: flex; flex-direction: row;">
+			<div style="display: flex; flex-direction: row; gap: 0.25rem;">
 				{stack.split(", ").map((s) => <span class="badge">{s}</span>)}
 			</div>
 			<p class="card__txt">
