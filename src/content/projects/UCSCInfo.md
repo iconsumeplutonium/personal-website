@@ -2,7 +2,7 @@
 title: 'UCSC Info'
 description: 'An all-in-one for UCSC students. Includes dining hall menu information, a combined news feed of all UCSC departments and feeds, and class search. Styles with raw CSS to ensure maximum responsiveness for mobile users.'
 image:
-  url: 'personal-website/images/ucscinfo2.png'
+  url: '/personal-website/images/ucscinfo2.png'
   alt: 'Screenshot of the UCSC Info website'
 links:
   - name: 'GitHub'

@@ -2,7 +2,7 @@
 title: 'Mince Raft'
 description: 'A web-based clone of the popular video game Minecraft written in WebGL. Infinite procedurally generated terrain with block interactions. Won the in-class contest for the assignment and made it to the class Hall of Fame.'
 image:
-  url: 'personal-website/images/minceraft2.png'
+  url: '/personal-website/images/minceraft2.png'
   alt: 'Screenshot of Minceraft showing the UI and procedurally generated terrain'
 links:
   - name: 'GitHub'
