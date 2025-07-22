@@ -2,7 +2,7 @@
 title: 'Slug Courses'
 description: 'A UCSC course search app written in Kotlin with a Python backend, and an integrated LLM to search for and ask for class recommendations in natural language. Won "Best Slug Hack" at CruzHacks 2024.'
 image:
-  url: '/images/slugcourses.png'
+  url: 'personal-website/images/slugcourses.png'
   alt: 'Screenshots of the SlugCourses mobile app showing the main page, the search page, and the course info page'
 links:
   - name: 'GitHub'

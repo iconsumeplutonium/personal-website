@@ -287,15 +287,15 @@ li {
 }
 
 .git-icon {
-	content: url("/images/github-mark-white.svg");
+	content: url("personal-website/images/github-mark-white.svg");
 }
 
 .mail-icon {
-	content: url("/images/mail-white.svg");
+	content: url("personal-website/images/mail-white.svg");
 }
 
 .linked-in {
-	content: url("/images/li-in-white.png");
+	content: url("personal-website/images/li-in-white.png");
 }
 
 
