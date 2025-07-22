@@ -3,88 +3,59 @@ import Layout from "../layouts/Layout.astro";
 import Works from "./works.astro";
 import ButtonWithLinks from "../components/ButtonWithLinks.astro";
 const pageTitle = "Milky-Way";
+
+function GetLanguageIcon(language: string) {
+	if (language === "WebGL") return "https://upload.wikimedia.org/wikipedia/commons/2/25/WebGL_Logo.svg"
+
+	const formattedName = language.toLowerCase().replaceAll('+', 'plus');
+	return `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${formattedName}/${formattedName}-original.svg`;
+}
+
+const skills = [
+	"Python", "C", "C++", "JavaScript", "TypeScript", "React", "CSS3", "WebGL", "OpenGL", "Linux", "Git"
+];
 ---
 
 <Layout pageTitle={pageTitle}>
 	<div style="display: flex; align-items: center;">
 		<h1>Umair Rizwan</h1>
-		<div style="flex-grow: 1; height: 1px; background-color: white; margin-left: 10px; margin-right: 10px; "></div>
+		<div
+			style="flex-grow: 1; height: 1px; background-color: white; margin-left: 10px; margin-right: 10px; "
+		>
+		</div>
 		<div class="header-buttons">
 			<ButtonWithLinks />
 		</div>
 	</div>
 	<p>
-		Praesent malesuada mi nisi, quis tempus magna venenatis ut. Suspendisse
-		tempor sem at scelerisque congue. Curabitur mollis, mi id molestie
-		finibus, metus sem sagittis nunc, euismod feugiat orci neque non lorem.
-		Aenean sollicitudin erat eu molestie tempus. Nunc ac eros elementum,
-		fermentum lacus at, pellentesque mauris. Suspendisse eros neque,
-		interdum euismod consectetur convallis, porttitor at massa. Phasellus a
-		ultrices arcu. Donec viverra, lorem in pellentesque euismod, libero
-		justo gravida nibh, non ultricies justo purus ultrices est.
+		Hello, world! I'm Umair Rizwan, a fourth year computer science student
+		at the University of California, Santa Cruz. I have a strong foundation
+		in programming and a passion for solving complex problems. My interests
+		span computer graphics, web development, software engineering,
+		theoretical computer science, as well as areas like computer networks,
+		augmented and virtual reality, and data visualization. I'm a dedicated
+		and detail-oriented learner who enjoys building things that are both
+		functional and thoughtfully designed, and I approach my work with
+		persistence and curiosity. I'm always looking to grow as a developer and
+		expand my skill set. Feel free to explore some of my projects below!
 	</p>
+
 	<div class="center footer-buttons">
-        <ButtonWithLinks />
-    </div>
+		<ButtonWithLinks />
+	</div>
 	<h2>Skills</h2>
 	<div class="skills center">
-		<img
-			class="skills__img"
-			width="46"
-			height="46"
-			alt="Python"
-			src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg"
-		/>
-		<img
-			class="skills__img"
-			width="46"
-			height="46"
-			alt="Golang"
-			src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/go/go-original-wordmark.svg"
-		/>
-		<img
-			class="skills__img"
-			width="46"
-			height="46"
-			alt="JavaScript"
-			src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg"
-		/>
-		<img
-			class="skills__img"
-			width="46"
-			height="46"
-			alt="TypeScript"
-			src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg"
-		/>
-		<img
-			class="skills__img"
-			width="46"
-			height="46"
-			alt="Docker"
-			src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg"
-		/>
-		<img
-			class="skills__img"
-			width="46"
-			height="46"
-			alt="Linux"
-			src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linux/linux-original.svg"
-		/>
-		<img
-			class="skills__img"
-			width="46"
-			height="46"
-			alt="Kubernetes"
-			src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/kubernetes/kubernetes-original.svg"
-		/>
-		<img
-			class="skills__img"
-			width="46"
-			height="46"
-			alt="Git"
-			src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/git/git-original.svg"
-		/>
+		{
+			skills.map((skill) => (
+				<img
+					class="skills__img"
+					width="46"
+					height="46"
+					alt={skill}
+					src={GetLanguageIcon(skill)}
+				/>
+			))
+		}
 	</div>
-	</p>
-	<Works />
 </Layout>
+<Works />
