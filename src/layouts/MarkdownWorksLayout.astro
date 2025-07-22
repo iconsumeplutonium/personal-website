@@ -14,9 +14,5 @@ const { frontmatter } = Astro.props;
         <li><span class="badge badge--item">WEBSITE</span><a class="badge__link" href={frontmatter.website} target="_blank">{frontmatter.website}</a></li>
         <li><span class="badge badge--item">GITHUB</span><a class="badge__link" href={frontmatter.github} target="_blank">{frontmatter.github}</a></li>
     </ul>
-    <div class="center">
-        <img class="pro-img" width="500px" height="281" src={frontmatter.worksImage1.url} alt={frontmatter.worksImage1.alt} />
-        <img class="pro-img" width="500px" height="281" src={frontmatter.worksImage2.url} alt={frontmatter.worksImage2.alt} />
-    </div>
 </BaseLayout>
 

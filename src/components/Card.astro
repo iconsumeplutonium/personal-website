@@ -4,7 +4,6 @@ interface Link {
 	url: string;
 }
 interface Props {
-	url: string;
 	image: string;
 	title: string;
 	body: string;
@@ -12,7 +11,7 @@ interface Props {
 	links?: Link[];
 }
 
-const { url, image, title, body, stack, links } = Astro.props;
+const { image, title, body, stack, links } = Astro.props;
 ---
 
 <li class="card">

@@ -5,6 +5,7 @@ import MarkdownWorksLayout from "../../layouts/MarkdownWorksLayout.astro";
 export const prerender = true;
 export async function getStaticPaths() {
     const projectEntries = await getCollection("projects");
+    console.log("Available project IDs:", projectEntries.map(e => e.id)); // Debug line
     return projectEntries.map((entry) => ({
         params: { slug: entry.id },
         props: { entry },
@@ -12,6 +13,10 @@ export async function getStaticPaths() {
 }
 
 const { entry } = Astro.props;
+if (!entry) {
+    console.error("Entry not found for slug:", Astro.params.slug);
+    return Astro.redirect("/404");
+}
 const { Content, headings } = await render(entry);
 ---
 
