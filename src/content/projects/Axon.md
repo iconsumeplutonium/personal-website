@@ -11,4 +11,5 @@ links:
     url: 'https://astro-milky-way.netlify.app/'
   - name: 'GitHub'
     url: 'https://github.com/ttomczak3/Milky-Way'
+order: 3
 ---
