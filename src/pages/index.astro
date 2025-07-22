@@ -6,6 +6,7 @@ const pageTitle = "Milky-Way";
 
 function GetLanguageIcon(language: string) {
 	if (language === "WebGL") return "https://upload.wikimedia.org/wikipedia/commons/2/25/WebGL_Logo.svg"
+	if (language === "C") return "https://upload.wikimedia.org/wikipedia/commons/1/18/C_Programming_Language.svg"
 
 	const formattedName = language.toLowerCase().replaceAll('+', 'plus');
 	return `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${formattedName}/${formattedName}-original.svg`;
