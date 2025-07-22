@@ -2,7 +2,7 @@
 title: 'Axon'
 description: 'A graph based note-taking app, where each node is a markdown editor, and each edge visualizes connections between notes. Quarter-long group software engineering project.'
 image:
-    url: '/images/GitHub.webp'
+    url: '/images/axon.png'
     alt: 'GitHub wallpaper'
 platform: Web
 stack: React, TypeScript

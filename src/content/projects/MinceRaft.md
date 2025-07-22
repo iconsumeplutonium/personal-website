@@ -2,7 +2,7 @@
 title: 'Mince Raft'
 description: 'A web-based clone of the popular video game Minecraft written in JavaScript and raw WebGL. Seed-determinstic infinite procedurally generated terrain with block interactions.'
 image:
-  url: '/images/GitHub.webp'
+  url: '/images/minceraft2.png'
   alt: 'GitHub wallpaper'
 platform: Web
 links:
