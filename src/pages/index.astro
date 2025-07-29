@@ -5,16 +5,29 @@ import ButtonWithLinks from "../components/ButtonWithLinks.astro";
 const pageTitle = "Milky-Way";
 
 function GetLanguageIcon(language: string) {
-	if (language === "WebGL") return "https://upload.wikimedia.org/wikipedia/commons/2/25/WebGL_Logo.svg"
-	if (language === "C") return "https://upload.wikimedia.org/wikipedia/commons/1/18/C_Programming_Language.svg"
+	if (language === "WebGL")
+		return "https://upload.wikimedia.org/wikipedia/commons/2/25/WebGL_Logo.svg";
+	if (language === "C")
+		return "https://upload.wikimedia.org/wikipedia/commons/1/18/C_Programming_Language.svg";
 
-	const formattedName = language.toLowerCase().replaceAll('+', 'plus');
+	const formattedName = language.toLowerCase().replaceAll("+", "plus");
 	return `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${formattedName}/${formattedName}-original.svg`;
 }
 
-const skills = [
-	"Python", "C", "C++", "JavaScript", "TypeScript", "React", "CSS3", "WebGL", "OpenGL", "Linux", "Git"
-];
+const skills = {
+	"Python": "https://www.python.org/",
+	"C": "https://en.wikipedia.org/wiki/C_(programming_language)",
+	"C++": "https://isocpp.org/",
+	"JavaScript": "https://en.wikipedia.org/wiki/JavaScript",
+	"TypeScript": "https://www.typescriptlang.org/",
+	"React": "https://react.dev/",
+	"HTML5": "https://en.wikipedia.org/wiki/HTML5",
+	"CSS3": "https://www.w3.org/Style/CSS/#specs",
+	"WebGL": "https://www.khronos.org/webgl/",
+	"OpenGL": "https://www.khronos.org/opengl/",
+	"Linux": "https://en.wikipedia.org/wiki/Linux",
+	"Git": "https://git-scm.com/",
+};
 ---
 
 <Layout pageTitle={pageTitle}>
@@ -30,15 +43,17 @@ const skills = [
 	</div>
 	<p>
 		Hello, world! I'm Umair Rizwan, a fourth year computer science student
-		at the University of California, Santa Cruz. I have a strong foundation
-		in programming and a passion for solving complex problems. My interests
-		span computer graphics, web development, software engineering,
-		theoretical computer science, as well as areas like computer networks,
-		augmented and virtual reality, and data visualization. I'm a dedicated
-		and detail-oriented learner who enjoys building things that are both
-		functional and thoughtfully designed, and I approach my work with
-		persistence and curiosity. I'm always looking to grow as a developer and
-		expand my skill set. Feel free to explore some of my projects below!
+		at the <a href="https://www.ucsc.edu/" target="_blank"
+			>University of California, Santa Cruz</a
+		>. I have a strong foundation in programming and a passion for solving
+		complex problems. My interests span computer graphics, web development,
+		software engineering, theoretical computer science, as well as areas
+		like computer networks, augmented and virtual reality, and data
+		visualization. I'm a dedicated and detail-oriented learner who enjoys
+		building things that are both functional and thoughtfully designed, and
+		I approach my work with persistence and curiosity. I'm always looking to
+		grow as a developer and expand my skill set. Feel free to explore some
+		of my projects below!
 	</p>
 
 	<div class="center footer-buttons">
@@ -47,14 +62,20 @@ const skills = [
 	<h2>Skills</h2>
 	<div class="skills center">
 		{
-			skills.map((skill) => (
-				<img
-					class="skills__img"
-					width="46"
-					height="46"
-					alt={skill}
-					src={GetLanguageIcon(skill)}
-				/>
+			Object.keys(skills).map((skill) => (
+				<a
+					href={skills[skill]}
+					target="_blank"
+					style="text-decoration: none; padding: 0; margin: 0; display: inline-block;"
+				>
+					<img
+						class="skills__img"
+						width="46"
+						height="46"
+						alt={skill}
+						src={GetLanguageIcon(skill)}
+					/>
+				</a>
 			))
 		}
 	</div>
