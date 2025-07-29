@@ -9,9 +9,10 @@ interface Props {
 	body: string;
 	stack: string;
 	links?: Link[];
+	year: number;
 }
 
-const { image, title, body, stack, links } = Astro.props;
+const { image, title, body, stack, links, year } = Astro.props;
 ---
 
 <li class="card">
@@ -28,9 +29,12 @@ const { image, title, body, stack, links } = Astro.props;
 			/>
 		</div>
 		<div class="card__content">
-			<h3 class="card__title" style="margin-bottom: -0.6rem;">
-				{title}
-			</h3>
+			<div style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline;">
+				<h3 class="card__title" style="margin-bottom: -0.6rem;">
+					{title}
+				</h3>
+				<h3 style="margin: 0; font-size: 1.2rem; color: #aaa;">{year}</h3>
+			</div>
 			<div style="display: flex; flex-direction: row; gap: 0.25rem;">
 				{stack.split(", ").map((s) => <span class="badge">{s}</span>)}
 			</div>

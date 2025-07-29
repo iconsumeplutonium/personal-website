@@ -13,4 +13,5 @@ links:
     url: 'https://canvas.ucsc.edu/courses/72715/pages/hall-of-fame'
 stack: WebGL, JavaScript, HTML, CSS
 order: 5
+year: 2024
 ---

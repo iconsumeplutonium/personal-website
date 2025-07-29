@@ -11,4 +11,5 @@ links:
     url: 'https://www.sixdegreesoffortnite.com/'
 stack: React, TypeScript, Python
 order: 1
+year: 2025
 ---

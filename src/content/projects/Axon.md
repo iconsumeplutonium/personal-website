@@ -13,4 +13,5 @@ links:
   - name: 'Demo Video'
     url: 'https://youtu.be/JdRwhOcxzvc'
 order: 3
+year: 2024
 ---

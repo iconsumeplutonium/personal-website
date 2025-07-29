@@ -13,4 +13,5 @@ links:
     url: 'https://courses.thinkfluence.rs/'
 stack: Kotlin, Python, Gemini, SQL
 order: 2
+year: 2024
 ---

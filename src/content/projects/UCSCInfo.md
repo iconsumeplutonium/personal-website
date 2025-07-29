@@ -13,4 +13,5 @@ links:
     url: 'https://devpost.com/software/ucsc-info'
 stack: React, TypeScript, Python
 order: 4
+year: 2025
 ---
