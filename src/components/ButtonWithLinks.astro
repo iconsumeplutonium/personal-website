@@ -5,7 +5,7 @@
 		</a>
 	</li>
 	<li class="icon__btn">
-		<a class="icon__link" href="mailto:urizwan@ucsc.edu">
+		<a class="icon__link" id="emailButton">
 			<span class="mail-icon">Email</span>
 		</a>
 	</li>
@@ -14,4 +14,19 @@
 			<span class="linked-in">LinkedIn</span>
 		</a>
 	</li>
+
+	
+	<script>
+		document.getElementById("emailButton")?.addEventListener("click", () => {
+			const email = 'dXJpendhbkB1Y3NjLmVkdQ==';
+			navigator.clipboard.writeText(atob(email))
+				.then(() => {
+					alert("Email copied to clipboard!");
+				})
+				.catch((err) => {
+					console.error("Failed to copy email: ", err);
+				});
+		});
+	</script>
+
 </ul>
