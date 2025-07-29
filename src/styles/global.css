@@ -54,6 +54,9 @@ small,
 li {
 	font-family: var(--body);
 }
+a {
+	color: #61dafb;
+}
 
 /* Navigation Bar */
 .navbar {

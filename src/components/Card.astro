@@ -42,7 +42,7 @@ const { image, title, body, stack, links, year } = Astro.props;
 				{body}
 			</p>
 			<div style="display: flex; flex-direction: row;">
-				{links && links.map((l) => <a href={l.url} style="padding-right: 10px; color: #61dafb">{l.name}</a>)}
+				{links && links.map((l) => <a href={l.url} style="padding-right: 10px;">{l.name}</a>)}
 			</div>
 		</div>
 	</div>
