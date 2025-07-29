@@ -11,6 +11,6 @@ links:
     url: 'https://devpost.com/software/slug-courses'
   - name: 'Web Version'
     url: 'https://courses.thinkfluence.rs/'
-stack: Kotlin, Python, Gemini
+stack: Kotlin, Python, Gemini, SQL
 order: 2
 ---
