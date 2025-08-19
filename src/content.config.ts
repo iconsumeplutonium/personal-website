@@ -21,7 +21,7 @@ const projectsCollection = defineCollection({
 });
 
 const postsCollection = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: "./src/content/posts" }),
+	loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: "./src/content/blog" }),
 	schema: z.object({
 		title: z.string(),
 		author: z.string(),
@@ -35,6 +35,6 @@ const postsCollection = defineCollection({
 
 export const collections = {
 	projects: projectsCollection,
-	posts: postsCollection
+	blog: postsCollection
 };
 

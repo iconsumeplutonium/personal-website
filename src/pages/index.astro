@@ -1,8 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Works from "./works.astro";
 import ButtonWithLinks from "../components/ButtonWithLinks.astro";
-const pageTitle = "Milky-Way";
+const pageTitle = "Umair Rizwan";
 
 function GetLanguageIcon(language: string) {
 	if (language === "WebGL")
@@ -15,18 +14,18 @@ function GetLanguageIcon(language: string) {
 }
 
 const skills = {
-	"Python": "https://www.python.org/",
-	"C": "https://en.wikipedia.org/wiki/C_(programming_language)",
+	Python: "https://www.python.org/",
+	C: "https://en.wikipedia.org/wiki/C_(programming_language)",
 	"C++": "https://isocpp.org/",
-	"JavaScript": "https://en.wikipedia.org/wiki/JavaScript",
-	"TypeScript": "https://www.typescriptlang.org/",
-	"React": "https://react.dev/",
-	"HTML5": "https://en.wikipedia.org/wiki/HTML5",
-	"CSS3": "https://www.w3.org/Style/CSS/#specs",
-	"WebGL": "https://www.khronos.org/webgl/",
-	"OpenGL": "https://www.khronos.org/opengl/",
-	"Linux": "https://en.wikipedia.org/wiki/Linux",
-	"Git": "https://git-scm.com/",
+	JavaScript: "https://en.wikipedia.org/wiki/JavaScript",
+	TypeScript: "https://www.typescriptlang.org/",
+	React: "https://react.dev/",
+	HTML5: "https://en.wikipedia.org/wiki/HTML5",
+	CSS3: "https://www.w3.org/Style/CSS/#specs",
+	WebGL: "https://www.khronos.org/webgl/",
+	OpenGL: "https://www.khronos.org/opengl/",
+	Linux: "https://en.wikipedia.org/wiki/Linux",
+	Git: "https://git-scm.com/",
 };
 
 /* 
@@ -37,6 +36,12 @@ stuff to be removed in the future:
 - remove the cruzhacks 2024 hyperlink
 - delete most of the blurb at the top 
 */
+
+import { getCollection } from "astro:content";
+import Card from "../components/Card.astro";
+const allProjects = await getCollection("projects");
+
+const orderedProjects = allProjects.sort((a, b) => a.data.order - b.data.order);
 ---
 
 <Layout pageTitle={pageTitle}>
@@ -52,8 +57,9 @@ stuff to be removed in the future:
 	</div>
 	<p>
 		Hello, world! I'm Umair Rizwan, a fourth year computer science student
-		at the <a href="https://www.ucsc.edu/" target="_blank">University of California, Santa Cruz (UCSC)</a>.
-		I have a strong foundation in programming and a passion for solving
+		at the <a href="https://www.ucsc.edu/" target="_blank"
+			>University of California, Santa Cruz (UCSC)</a
+		>. I have a strong foundation in programming and a passion for solving
 		complex problems. My interests span computer graphics, web development,
 		software engineering, theoretical computer science, as well as areas
 		like computer networks, augmented and virtual reality, and data
@@ -87,5 +93,22 @@ stuff to be removed in the future:
 			))
 		}
 	</div>
+
+	<h2>Projects</h2>
+	<ul role="list" class="link-card-grid">
+		{
+			orderedProjects.map((card) => {
+				return (
+					<Card
+						image={card.data.image.url}
+						title={card.data.title}
+						body={card.data.description}
+						stack={card.data.stack}
+						links={card.data.links}
+						year={card.data.year}
+					/>
+				);
+			})
+		}
+	</ul>
 </Layout>
-<Works />
