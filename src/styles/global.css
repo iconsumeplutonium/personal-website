@@ -54,7 +54,7 @@ small,
 li {
 	font-family: var(--body);
 }
-a {
+.hyperlink {
 	color: #61dafb;
 }
 
