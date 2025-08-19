@@ -144,7 +144,6 @@ li {
 	display: flex;
 	background-size: 400%;
 	padding: 20px;
-	/* align-items: center; */
 }
 
 .card__link {
@@ -327,6 +326,11 @@ li {
 	content: url("/images/li-in-white.webp");
 }
 
+.badges {
+	display: flex; 
+	flex-direction: 
+	row; gap: 0.25rem;
+}
 
 
 /* Media Query */

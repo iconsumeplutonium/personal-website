@@ -35,7 +35,7 @@ const { image, title, body, stack, links, year } = Astro.props;
 				</h3>
 				<h3 style="margin: 0; font-size: 1.2rem; color: #aaa;">{year}</h3>
 			</div>
-			<div style="display: flex; flex-direction: row; gap: 0.25rem;">
+			<div class="badges">
 				{stack.split(", ").map((s) => <span class="badge">{s}</span>)}
 			</div>
 			<!-- <p class="card__txt">

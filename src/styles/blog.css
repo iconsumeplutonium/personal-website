@@ -1,0 +1,11 @@
+.blogCard {
+	background-color: #26425da8; 
+	border-radius: 5px;
+}
+
+.blogCardTitle {
+	display: flex; 
+	flex-direction: row; 
+	justify-content: flex-start;
+	align-items: baseline;
+}
