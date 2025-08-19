@@ -9,27 +9,19 @@ interface Props {
 const { title, date, description, url } = Astro.props;
 ---
 
-<li class="card">
-	<a>
-		<div class="card__link">
-			<div class="card__content">
-				<div
-					style="display: flex; flex-direction: row; justify-content: space-between; align-items: baseline;"
-				>
-					<h3 class="card__title" style="margin-bottom: -0.6rem;">
+<li class="card" style="background-color: #26425da8; border-radius: 5px;">
+	<a href={url} style="all: unset; cursor: pointer;">
+		<div>
+			<div class="card__content" style="text-align: left;">
+				<div style="display: flex; flex-direction: row; justify-content: flex-start; align-items: baseline;">
+					<h3 class="card__title hyperlink" style="margin-bottom: -0.6rem;">
 						{title}
 					</h3>
 				</div>
 				<div style="display: flex; flex-direction: row; gap: 0.25rem;">
 					<span class="badge">{date}</span>
 				</div>
-				<!-- <p class="card__txt">
-				{body}
-			</p> -->
 				<p class="card__txt" set:html={description} />
-				<!-- <div style="display: flex; flex-direction: row;">
-				{links && links.map((l) => <a href={l.url} target="_blank" style="padding-right: 10px;">{l.name}</a>)}
-			</div> -->
 			</div>
 		</div>
 	</a>
