@@ -1,6 +1,6 @@
 ---
 title: 'Post 2'
-date: '03-23-2025'
+date: '03-24-2025'
 description: Lorem ipsum lorem convallis, ultrices nisl vitae, imper
 ---
 
