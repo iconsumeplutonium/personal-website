@@ -217,7 +217,7 @@ After running that, we end up with this:
   <img class="pro-img" src="/images/messedupprojection_topview.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
 </div>
 
-The points near the poles are heavily distorted, and there is only one hemisphere of points. A bit of googling led me to [this](https://stackoverflow.com/a/1185413) Stack Overflow post with the correct formula. I didn't understand why this was at first, but after racking my brains for a bit, here is my tenuous understanding:
+The points near the poles are heavily distorted, and there is only one hemisphere of points. A bit of googling led me to [this](https://stackoverflow.com/a/1185413) Stack Overflow post with the correct formula. I didn't understand why this was at first, but after a bit of research, here is my tenuous understanding (forewarning: I'm not quite sure how correct this is):
 
 Latitude is measured from -90° at the South Pole, to 90° at the North pole, or $-\frac{\pi}{2}$ to $\frac{\pi}{2}$. In spherical coordinates, $\theta$ goes from $0$ to $\pi$. In order to put latitude in that $0$ to $\pi$ range, we need to add $\frac{\pi}{2}$ to it. 
 
@@ -253,7 +253,7 @@ Its hard to see in the image, but the globe is now correct. and you can see the 
 
 
 <div class="center">
-	<video width="600" height="auto" controls autoplay muted loop>
+	<video width="600" height="auto" controls autoplay muted loop style="max-width: 100%">
 		<source src="/globe.mp4" type="video/mp4" />
 		Your browser does not support the video tag.
 	</video>
@@ -279,8 +279,16 @@ const x = r * Math.cos(latitude) * Math.cos(longitude);
 const y = r * Math.cos(latitude) * Math.sin(longitude);
 const z = r * Math.sin(latitude);
 ```
-
 </details>
+
+Another cool thing that can be done is that if I forgo the spherical to Cartesian conversion, and just treat latitude and longitude as regular Cartesian coordinates directly, I end up with a flat, Mercator projection of the whole planet.
+
+<div class="center">
+  <img class="pro-img" src="/images/mercator.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
+</div>
+
+
+
 
 
 

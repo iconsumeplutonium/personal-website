@@ -95,6 +95,53 @@ pre code {
 .token.operator { color: #f5c2e7; }
 .token.punctuation { color: #cdd6f4; }
 
+details {
+    font-family: var(--header);
+    padding-top: 30px;
+    border: 2px solid #584966;
+    border-radius: 12px;
+    padding: 0.75rem;
+    margin: 1rem 0;
+    transition: all 0.3s ease;
+}
+
+
+details[open] {
+    border-color: #61dafb;
+    box-shadow: 0 8px 32px rgba(97, 218, 251, 0.15);
+}
+
+summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text);
+    position: relative;
+    list-style: none;
+    transition: all 0.3s ease;
+}
+
+summary::-webkit-details-marker {
+    display: none;
+}
+
+summary::before {
+    content: "▶";
+    color: #78c2ad;
+    margin-right: 0.75rem;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Navigation Bar */
 .navbar {
 	display: grid;
