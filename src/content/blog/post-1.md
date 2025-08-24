@@ -154,8 +154,134 @@ MariaDB [wikipedia]> SELECT gt_page_id,gt_lat,gt_lon FROM geo_tags WHERE gt_page
 5 rows in set (0.000 sec)
 ```
 
-So as it turns out each article can have *multiple* sets of coordinates associated with it. 
+So as it turns out each article can have *multiple* sets of coordinates associated with it. Visiting article 303, which is the Wikipedia page for [Alabama](https://en.wikipedia.org/wiki/Alabama), there is only one set of coordinates in the top right of the article, which means clearly there must be some way to distinguish the main set of coordinates. Looking at the schema again, there's an attribute called `gt_primary` that can never be null. That seems promising. Let's try that. 
+
+```sql
+MariaDB [wikipedia]> SELECT gt_page_id,gt_lat,gt_lon,gt_primary FROM geo_tags WHERE gt_page_id = 303;
++------------+-------------+--------------+------------+
+| gt_page_id | gt_lat      | gt_lon       | gt_primary |
++------------+-------------+--------------+------------+
+|        303 | 34.71361111 | -86.58611111 |          0 |
+|        303 | 33.65333333 | -86.80888889 |          0 |
+|        303 | 32.36166667 | -86.27916667 |          0 |
+|        303 | 30.69444444 | -88.04305556 |          0 |
+|        303 | 33.00000000 | -87.00000000 |          1 |
++------------+-------------+--------------+------------+
+5 rows in set (0.001 sec)
+```
+
+Would you look at that, only one set of coordinates happens to have `gt_primary` as 1. With a statistically significant sample size of one article, I can conclude that this must be true for all articles. I can test it by running the count query again, but only counting coordinates where `gt_primary` is 1.
+
+```sql
+MariaDB [wikipedia]> SELECT COUNT(*) FROM geo_tags WHERE gt_primary = 1;
++----------+
+| COUNT(*) |
++----------+
+|  1247084 |
++----------+
+1 row in set (0.525 sec)
+```
+
+1.2 million, just like the Category page said. The number doesn't match one to one, but that page did say that their number might not be accurate, so this is good enough. 
+
+Now to create the visualization, the three primary attributes I'm interested in are `gt_page_id` (so I can pull article informaton on click), `gt_lat`, and `gt_lon`. To make it simple for now, I'll just dump all of these into one really big text file, and parse that on page load. Later, I'll focus on compressing the data properly to reduce network traffic.
+
+```bash
+sudo mysql -e "SELECT gt_lat,gt_lon FROM geo_tags WHERE gt_primary = 1;" wikipedia > coords.txt
+```
+
+### Projecting to a Globe
+
+To render the points in my browser, I'll be using Three.js (using WebGL would be pretty fun, but I don't want to go through the process of implementing my own orbit controls). Latitude and longitude are angles, and we need to convert them to a position in 3D space, so we can use the formula for converting spherical coordinates into Cartesian coordinates, using latitude as $\theta$, longitude as $\phi$, and any arbitrary value for the radius. In the code, that looks something like this.
+
+```js
+for (let i = 0; i < numRowsInCoordinateData; i++) {
+	const r = globeScale;
+	const latitude = lats[i] * Math.PI / 180;
+	const longitude = lons[i] * Math.PI / 180;
+
+	const x = r * Math.sin(latitude) * Math.cos(longitude);
+	const y = r * Math.sin(latitude) * Math.sin(longitude);
+	const z = r * Math.cos(latitude);
+
+	processedCoords.push(new Vector3(x, y, z));
+}
+```
+
+After running that, we end up with this:
+
+<div class="center">
+  <img class="pro-img" src="/images/messedupprojection.png" alt="Half-hemisphere of points, all messed up" width="600px" height="auto" loading="lazy" decoding="async">
+</div>
+<div class="center">
+  <img class="pro-img" src="/images/messedupprojection_topview.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
+</div>
+
+The points near the poles are heavily distorted, and there is only one hemisphere of points. A bit of googling led me to [this](https://stackoverflow.com/a/1185413) Stack Overflow post with the correct formula. I didn't understand why this was at first, but after racking my brains for a bit, here is my tenuous understanding:
+
+Latitude is measured from -90° at the South Pole, to 90° at the North pole, or $-\frac{\pi}{2}$ to $\frac{\pi}{2}$. In spherical coordinates, $\theta$ goes from $0$ to $\pi$. In order to put latitude in that $0$ to $\pi$ range, we need to add $\frac{\pi}{2}$ to it. 
+
+$$
+\theta = \text{latitude} + \frac{\pi}{2}
+$$
+
+That puts it in the right range, but now the direction is wrong. $\theta$ increases "southward", while latitude increases northward. See the following LaTeX diagram for an visual.
+
+<div class="center">
+  <img class="pro-img" src="/images/thetaexplanation.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
+</div>
+
+So to fix, that we need to invert the formula to be
+
+$$
+\theta = \frac{\pi}{2} - \text{latitude}
+$$
+
+Substituting this new formula into the code, we now get this:
+
+```js
+const x = r * Math.sin((Math.PI / 2) - latitude) * Math.cos(longitude);
+const y = r * Math.sin((Math.PI / 2) - latitude) * Math.sin(longitude);
+const z = r * Math.cos((Math.PI / 2) - latitude);
+```
+
+<div class="center">
+  <img class="pro-img" src="/images/correctglobe_seethrough.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
+</div>
+
+Its hard to see in the image, but the globe is now correct. and you can see the shape of the continents. Applying a custom shader to hide points that shouldn't be visible yields this:
 
 
-The three primary attributes I'm interested in are `gt_page_id`, `gt_lat`, and `gt_lon`. To make it simple for now, I'll just dump all of these into one really big text file, and parse that on page load. Later, I'll focus on compressing the data to reduce network traffic.
+<div class="center">
+	<video width="600" height="auto" controls autoplay muted loop>
+		<source src="/globe.mp4" type="video/mp4" />
+		Your browser does not support the video tag.
+	</video>
+</div>
+
+<details open>
+  <summary>Addendum</summary>
+
+There is a set of trigonometric identities known as the *co-function identities* which state
+
+$$
+\sin(\frac{\pi}{2} -  \theta) = \cos(\theta)
+$$
+
+$$
+\cos(\frac{\pi}{2} -  \theta) = \sin(\theta)
+$$
+
+We can subsitute these in to simplify the code:
+
+```js
+const x = r * Math.cos(latitude) * Math.cos(longitude);
+const y = r * Math.cos(latitude) * Math.sin(longitude);
+const z = r * Math.sin(latitude);
+```
+
+</details>
+
+
+
 
