@@ -217,24 +217,35 @@ After running that, we end up with this:
   <img class="pro-img" src="/images/messedupprojection_topview.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
 </div>
 
-The points near the poles are heavily distorted, and there is only one hemisphere of points. A bit of googling led me to [this](https://stackoverflow.com/a/1185413) Stack Overflow post with the correct formula. I didn't understand why this was at first, but after a bit of research, here is my tenuous understanding (forewarning: I'm not quite sure how correct this is):
+The points near the poles are heavily distorted, and there is only one hemisphere of points. A bit of googling led me to [this](https://stackoverflow.com/a/1185413) Stack Overflow post with the correct formula. At the time, I didn't understand why this worked and just blindy followed it, but during the process of writing this post, I decided to go back and try to understand it. If you're interested, you can read the following addendum for an explanation, or skip ahead to see it working.
 
-Latitude is measured from -90° at the South Pole, to 90° at the North pole, or $-\frac{\pi}{2}$ to $\frac{\pi}{2}$. In spherical coordinates, $\theta$ goes from $0$ to $\pi$. In order to put latitude in that $0$ to $\pi$ range, we need to add $\frac{\pi}{2}$ to it. 
 
-$$
-\theta = \text{latitude} + \frac{\pi}{2}
-$$
 
-That puts it in the right range, but now the direction is wrong. $\theta$ increases "southward", while latitude increases northward. See the following LaTeX diagram for an visual.
 
-<div class="center">
-  <img class="pro-img" src="/images/thetaexplanation.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
-</div>
 
-So to fix, that we need to invert the formula to be
+
+
+
+
+<details>
+<summary>Interlude: Spherical coordinates</summary>
+
+Here is my tenuous understanding of how this works, I'm not quite sure how correct this is.
+
+In spherical coordinates, $\theta$ goes from $0$ at the "north pole" to $\pi$ at the "south pole", but latitude is measured from to 90° at the North pole ($\frac{\pi}{2}$) to -90° at the South Pole (-$\frac{\pi}{2}$). So in other words, we need to map the range $[\frac{\pi}{2}, -\frac{\pi}{2}]$ to $[0, \pi]$. To do so, we can use the formula
 
 $$
 \theta = \frac{\pi}{2} - \text{latitude}
+$$
+
+Testing it out, it indeed maps $[\frac{\pi}{2}, -\frac{\pi}{2}]$ to $[0, \pi]$
+
+$$
+\text{North pole} \Rightarrow \frac{\pi}{2} - \frac{\pi}{2} = 0
+$$
+
+$$
+\text{South pole} \Rightarrow \frac{\pi}{2} - (-\frac{\pi}{2}) = \pi
 $$
 
 Substituting this new formula into the code, we now get this:
@@ -245,24 +256,7 @@ const y = r * Math.sin((Math.PI / 2) - latitude) * Math.sin(longitude);
 const z = r * Math.cos((Math.PI / 2) - latitude);
 ```
 
-<div class="center">
-  <img class="pro-img" src="/images/correctglobe_seethrough.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
-</div>
-
-Its hard to see in the image, but the globe is now correct. and you can see the shape of the continents. Applying a custom shader to hide points that shouldn't be visible yields this:
-
-
-<div class="center">
-	<video width="600" height="auto" controls autoplay muted loop style="max-width: 100%">
-		<source src="/globe.mp4" type="video/mp4" />
-		Your browser does not support the video tag.
-	</video>
-</div>
-
-<details open>
-<summary>Addendum: Co-function Identities</summary>
-
-There is a set of trigonometric identities known as the *co-function identities* which state
+From here, we can simplify the formula by using the trigonometric identities known as the *co-function identities* which state
 
 $$
 \sin(\frac{\pi}{2} -  \theta) = \cos(\theta)
@@ -271,8 +265,6 @@ $$
 $$
 \cos(\frac{\pi}{2} -  \theta) = \sin(\theta)
 $$
-
-We can subsitute these in to simplify the code:
 
 ```js
 const x = r * Math.cos(latitude) * Math.cos(longitude);
@@ -283,7 +275,46 @@ const z = r * Math.sin(latitude);
 which corroborates that Stack Overflow post from earlier.
 </details>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="center">
+  <img class="pro-img" src="/images/correctglobe_seethrough.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
+</div>
+
+Its hard to see in the image, but after plugging in the updated formula the globe is now correct. and you can see the shape of the continents. Applying a custom shader to hide points that shouldn't be visible yields this:
+
+
+<div class="center">
+	<video width="600" height="auto" controls autoplay muted loop style="max-width: 100%">
+		<source src="/globe.mp4" type="video/mp4" />
+		Your browser does not support the video tag.
+	</video>
+</div>
+
+
+
+
+
 Another cool thing that can be done is that if I forgo the spherical to Cartesian conversion, and just treat latitude and longitude as regular Cartesian coordinates directly, I end up with a flat, Mercator projection of the whole planet.
+
+```js
+const v = new Vector3(lats[i], lons[i], 0).multiplyScalar(flatMapScale); // scale it by some arbirary value
+processedCoords.push(v);
+```
 
 <div class="center">
   <img class="pro-img" src="/images/mercator.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
