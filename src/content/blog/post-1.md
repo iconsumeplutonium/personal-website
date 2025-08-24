@@ -187,7 +187,7 @@ MariaDB [wikipedia]> SELECT COUNT(*) FROM geo_tags WHERE gt_primary = 1;
 Now to create the visualization, the three primary attributes I'm interested in are `gt_page_id` (so I can pull article informaton on click), `gt_lat`, and `gt_lon`. To make it simple for now, I'll just dump all of these into one really big text file, and parse that on page load. Later, I'll focus on compressing the data properly to reduce network traffic.
 
 ```bash
-sudo mysql -e "SELECT gt_lat,gt_lon FROM geo_tags WHERE gt_primary = 1;" wikipedia > coords.txt
+sudo mysql -e "SELECT gt_page_id,gt_lat,gt_lon FROM geo_tags WHERE gt_primary = 1;" wikipedia > coords.txt
 ```
 
 ### Projecting to a Globe
@@ -260,7 +260,7 @@ Its hard to see in the image, but the globe is now correct. and you can see the 
 </div>
 
 <details open>
-  <summary>Addendum</summary>
+<summary>Addendum: Co-function Identities</summary>
 
 There is a set of trigonometric identities known as the *co-function identities* which state
 
@@ -279,6 +279,8 @@ const x = r * Math.cos(latitude) * Math.cos(longitude);
 const y = r * Math.cos(latitude) * Math.sin(longitude);
 const z = r * Math.sin(latitude);
 ```
+
+which corroborates that Stack Overflow post from earlier.
 </details>
 
 Another cool thing that can be done is that if I forgo the spherical to Cartesian conversion, and just treat latitude and longitude as regular Cartesian coordinates directly, I end up with a flat, Mercator projection of the whole planet.
@@ -288,8 +290,181 @@ Another cool thing that can be done is that if I forgo the spherical to Cartesia
 </div>
 
 
+### Filtering out non-articles
 
+As I progressed through this project, I added the ability to click on points and view the associated Wikipedia article. This led to me discovering that there existed pages on Wikipedia that have geographic coordiantes, but aren't articles. For instance, I discovered a point at 0°N 90°W associated with [this](https://en.wikipedia.org/?curid=17458267) page, which appears to belong to a user. I needed a way to filter out all the points that weren't articles. Where would I get that information? Well, it turns out that information is back in `enwiki-latest-pages.sql`, that 7GB SQL file that wasn't even halfway done after 4 hours of importing. According to the [schema](https://www.mediawiki.org/wiki/Manual:Page_table#page_namespace), the `page_namespace` column would tell me if an page was an article or not. 
 
+(Now it was at this point that I got distracted and discovered that the `enwiki-latest-geo_tags.sql` table from earlier had coordinates for planets *other than Earth!* If you want to read more about that, check out the following addendum.)
 
+<details>
+<summary>Addendum: gt_globe and other celestial bodies</summary>
 
+After looking at the schema for the geotags DB again, I noticed that there was a column called `gt_globe` that could not be null, i.e. it must be present for every single set of coordinates. I ran it for the first 10 set of coordinates
 
+```sql
+MariaDB [wikipedia]> select gt_globe from geo_tags limit 10;
++----------+
+| gt_globe |
++----------+
+| earth    |
+| earth    |
+| earth    |
+| earth    |
+| earth    |
+| earth    |
+| earth    |
+| earth    |
+| earth    |
+| earth    |
++----------+
+10 rows in set (0.011 sec)
+```
+
+*Aren't all of these coordinates for Earth? what's the point of this column?*, I thought. So I decided to grab every single `gt_globe` and its count.
+
+```sql
+MariaDB [wikipedia]> SELECT gt_globe,COUNT(*) FROM geo_tags GROUP BY gt_globe ORDER BY COUNT(*) DESC;
++------------+----------+
+| gt_globe   | COUNT(*) |
++------------+----------+
+| earth      |  2663854 |
+| moon       |     4743 |
+| mars       |     3119 |
+| venus      |     1201 |
+| mercury    |      942 |
+| titan      |      446 |
+| ganymede   |      347 |
+| callisto   |      301 |
+| io         |      301 |
+| vesta      |      296 |
+| ceres      |      211 |
+| dione      |      168 |
+| iapetus    |      137 |
+| eros       |      117 |
+| europa     |      111 |
+| tethys     |      108 |
+| rhea       |      105 |
+| enceladus  |      102 |
+| gaspra     |       97 |
+| ez         |       94 |
+| lutetia    |       75 |
+| pluto      |       61 |
+| titania    |       56 |
+| phoebe     |       51 |
+| ariel      |       49 |
+| ida        |       48 |
+| phobos     |       44 |
+| mimas      |       38 |
+| itokawa    |       37 |
+| oberon     |       32 |
+| umbriel    |       30 |
+| charon     |       24 |
+| miranda    |       23 |
+| mathilde   |       23 |
+| steins     |       23 |
+| triton     |       23 |
+| hyperion   |       11 |
+| deimos     |        8 |
+| jupiter    |        7 |
+| dactyl     |        4 |
+| proteus    |        3 |
+| amalthea   |        2 |
+| thebe      |        2 |
+| janus      |        1 |
+| adrastea   |        1 |
+| puck       |        1 |
+| cordelia   |        1 |
+| atlas      |        1 |
+| luna       |        1 |
+| galatea    |        1 |
+| juliet     |        1 |
+| telesto    |        1 |
+| marás      |        1 |
+| neptune    |        1 |
+| ophelia    |        1 |
+| prometheus |        1 |
+| golevka    |        1 |
+| larissa    |        1 |
+| portia     |        1 |
+| calypso    |        1 |
+| naiad      |        1 |
+| bianca     |        1 |
+| pandora    |        1 |
+| borrelly   |        1 |
+| rosalind   |        1 |
+| helene     |        1 |
+| saturn     |        1 |
+| sun        |        1 |
+| thalassa   |        1 |
+| cressida   |        1 |
+| epimetheus |        1 |
+| metis      |        1 |
+| belinda    |        1 |
+| uranus     |        1 |
+| pan        |        1 |
+| terra      |        1 |
+| despina    |        1 |
+| test       |        1 |
+| desdemona  |        1 |
++------------+----------+
+79 rows in set (2.976 sec)
+```
+
+Huh. 
+
+I was curious as to what some of these bodies were, as I had never heard of any place named `test`. As it turns out, a lot of the celestial bodies don't have an associated article. Most of them are from page with an ID of 22123904 ([Template:Coord/testcases](https://en.wikipedia.org/?curid=22123904)) and 55067190 [(Wikipedia talk:Coordinates in infoboxes/Archive 2](https://en.wikipedia.org/?curid=55067190)). Filtering these two out gives us a better picture of the available coordinates (I'm sure there's more such articles, but I'll dig into that later).
+
+```sql
+MariaDB [wikipedia]> SELECT gt_globe,COUNT(*) FROM geo_tags WHERE gt_page_id != 22123904 AND gt_page_id != 55067190 GROUP BY gt_globe ORDER BY COUNT(*) DESC;
++-----------+----------+
+| gt_globe  | COUNT(*) |
++-----------+----------+
+| earth     |  2663735 |
+| moon      |     4738 |
+| mars      |     3114 |
+| venus     |     1199 |
+| mercury   |      940 |
+| titan     |      445 |
+| ganymede  |      346 |
+| callisto  |      300 |
+| io        |      300 |
+| vesta     |      295 |
+| ceres     |      210 |
+| dione     |      167 |
+| iapetus   |      136 |
+| eros      |      116 |
+| europa    |      110 |
+| tethys    |      107 |
+| rhea      |      104 |
+| enceladus |      101 |
+| gaspra    |       96 |
+| ez        |       94 |
+| lutetia   |       75 |
+| pluto     |       60 |
+| titania   |       55 |
+| phoebe    |       50 |
+| ariel     |       48 |
+| ida       |       47 |
+| phobos    |       43 |
+| mimas     |       37 |
+| itokawa   |       37 |
+| oberon    |       31 |
+| umbriel   |       29 |
+| steins    |       23 |
+| mathilde  |       23 |
+| charon    |       23 |
+| miranda   |       22 |
+| triton    |       22 |
+| hyperion  |       10 |
+| deimos    |        7 |
+| jupiter   |        6 |
+| dactyl    |        4 |
+| proteus   |        2 |
+| marás     |        1 |
+| amalthea  |        1 |
+| thebe     |        1 |
++-----------+----------+
+44 rows in set (2.459 sec)
+```
+
+</details>
