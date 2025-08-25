@@ -48,7 +48,7 @@ For some reason, the generator prop only returns the coordinates *for the first 
 
 ### WikiData Dumps
 
-So if querying the specific data I needed data over the network via an API is out of the question, my next idea was a real simple one: just download Wikipedia. 
+So if querying the specific data I needed over the network via an API is out of the question, my next idea was a real simple one: just download Wikipedia. 
 
 It's not actually as farfetched as it seems. Wikipedia provides ways to download all of their articles for offline access, and it isn't that much larger than a modern AAA video game. English Wikipedia with only text is 58GB, and around 100GB with all media ([source](https://en.wikipedia.org/wiki/Wikipedia:Statistics#Statistics_by_namespace)). I've even known a few people in real life who like to keep offline copies of Wikipedia on their device. Now the most common way to download Wikipedia is to use a program called [Kiwix](https://kiwix.org/en/). Once installed, you can download Wikipedia in one click, and use the software to browse it locally, just like you would in a web browser. After looking into this route, the main issue with that is that it doesn't download the articles as regular HTML files, it stores it as one very large 100GB file in the `.zim` file format, which I had never heard of. As I looked into it more, I discovered that Wikipedia also provides its data in SQL and XML formats [here](https://dumps.wikimedia.org/enwiki/) ([source](https://en.wikipedia.org/wiki/Wikipedia:Database_download#Where_do_I_get_the_dumps?)). This was a very useful discovery, as now I could simply run SQL queries against the database to get the data I needed, without downloading articles that I didn't care about.
 
@@ -637,4 +637,24 @@ with open('filteredDB.sql', 'w', encoding='utf-8') as file:
 			data = "INSERT INTO `page` VALUES "
 ```
 
+Now after running it, we're left with a file with only 1.2 million records.
+
+```bash
+> cat filteredDB.sql | grep -oE '\)[,|;]' | wc -l
+1241480
+```
+
+Now when I try to import it into MariaDB, it only takes about 20 minutes (about the same time it took to import `enwiki-latest-geo_tags.sql`). Now finally, In order to get only pages that are geotagged articles, I can run this query:
+
+```sql
+SELECT gt.gt_page_id, gt.gt_lat, gt.gt_lon FROM geo_tags gt 
+JOIN page p ON p.page_id = gt.gt_page_id 
+WHERE 
+	gt.gt_primary = 1 AND 
+	gt.gt_globe = 'earth' AND 
+	p.page_namespace = 0 AND 
+	p.page_is_redirect = 0;
+```
+
+Leaving us with a text file containing 1,227,760 articles. Now when this gets rendered, all non-article pages (like that one User sandbox article at 0°N 90°W) are gone. 
 

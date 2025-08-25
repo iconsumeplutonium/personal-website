@@ -70,8 +70,9 @@ pre {
 	overflow-x: auto;
 	position: relative;
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-	max-height: 500px;
-	overflow-y: auto;
+	/* max-height: 496px; */
+	/* overflow-y: auto; */
+	/* scrollbar-gutter: stable; */
 }
 
 code {
