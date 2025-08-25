@@ -70,6 +70,8 @@ pre {
 	overflow-x: auto;
 	position: relative;
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+	max-height: 500px;
+	overflow-y: auto;
 }
 
 code {
@@ -84,6 +86,37 @@ pre code {
 	padding: 0;
 	border: none;
 	border-radius: 0;
+}
+
+/* Custom scrollbar for code blocks */
+pre::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+pre::-webkit-scrollbar-track {
+	background: #1e1e2e;
+	border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb {
+	background: #584966;
+	border-radius: 4px;
+	border: 1px solid #2a2d47;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+	background: #78c2ad;
+}
+
+pre::-webkit-scrollbar-corner {
+	background: #1e1e2e;
+}
+
+/* Firefox scrollbar styling */
+pre {
+	scrollbar-width: thin;
+	scrollbar-color: #78c2ad #1e1e2e;
 }
 
 /* Syntax highlighting placeholders */

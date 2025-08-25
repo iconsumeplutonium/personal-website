@@ -272,7 +272,7 @@ const y = r * Math.cos(latitude) * Math.sin(longitude);
 const z = r * Math.sin(latitude);
 ```
 
-which corroborates that Stack Overflow post from earlier.
+which corroborates that Stack Overflow post from earlier. Nice.
 </details>
 
 
@@ -321,16 +321,10 @@ processedCoords.push(v);
 </div>
 
 
-### Filtering out non-articles
-
-As I progressed through this project, I added the ability to click on points and view the associated Wikipedia article. This led to me discovering that there existed pages on Wikipedia that have geographic coordiantes, but aren't articles. For instance, I discovered a point at 0°N 90°W associated with [this](https://en.wikipedia.org/?curid=17458267) page, which appears to belong to a user. I needed a way to filter out all the points that weren't articles. Where would I get that information? Well, it turns out that information is back in `enwiki-latest-pages.sql`, that 7GB SQL file that wasn't even halfway done after 4 hours of importing. According to the [schema](https://www.mediawiki.org/wiki/Manual:Page_table#page_namespace), the `page_namespace` column would tell me if an page was an article or not. 
-
-(Now it was at this point that I got distracted and discovered that the `enwiki-latest-geo_tags.sql` table from earlier had coordinates for planets *other than Earth!* If you want to read more about that, check out the following addendum.)
-
 <details>
-<summary>Addendum: gt_globe and other celestial bodies</summary>
+<summary>Interlude: gt_globe and other celestial bodies</summary>
 
-After looking at the schema for the geotags DB again, I noticed that there was a column called `gt_globe` that could not be null, i.e. it must be present for every single set of coordinates. I ran it for the first 10 set of coordinates
+Now it was at this point that I got distracted and starting looking at the `enwiki-latest-geo_tags.sql` table from earlier and noticed that there was a column called `gt_globe` that could not be null, i.e. it must be present for every single set of coordinates. I ran it for the first 10 set of coordinates
 
 ```sql
 MariaDB [wikipedia]> select gt_globe from geo_tags limit 10;
@@ -498,4 +492,149 @@ MariaDB [wikipedia]> SELECT gt_globe,COUNT(*) FROM geo_tags WHERE gt_page_id != 
 44 rows in set (2.459 sec)
 ```
 
+insert something about gt_globe equals earth in future queries
+
 </details>
+
+
+
+
+
+
+### Filtering out non-articles
+
+As I progressed through this project, I added the ability to click on points and view the associated Wikipedia article. This led to me discovering that there existed pages on Wikipedia that have geographic coordiantes, but aren't articles. For instance, I discovered a point at 0°N 90°W associated with [this](https://en.wikipedia.org/?curid=17458267) page, which appears to belong to a user. I needed a way to filter out all the points that weren't articles. Where would I get that information? Well, it turns out that information is back in `enwiki-latest-pages.sql`, that 7GB SQL file that wasn't even halfway done after 4 hours of importing. According to the [schema](https://www.mediawiki.org/wiki/Manual:Page_table#page_namespace), the `page_namespace` column would tell me if an page was an article or not. 
+
+So I started to probe `enwiki-latest-pages.sql`. The first 51 lines of the file were metadata about the database the file creates and whatnot.
+
+```sql
+> head -51 enwiki-latest-page.sql
+
+/*M!999999\- enable the sandbox mode */
+-- MariaDB dump 10.19  Distrib 10.5.29-MariaDB, for debian-linux-gnu (x86_64)
+--
+-- Host: dbstore1008.eqiad.wmnet    Database: enwiki
+-- ------------------------------------------------------
+-- Server version       10.11.13-MariaDB-log
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `page`
+--
+
+DROP TABLE IF EXISTS `page`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `page` (
+  `page_id` int(8) unsigned NOT NULL AUTO_INCREMENT,
+  `page_namespace` int(11) NOT NULL DEFAULT 0,
+  `page_title` varbinary(255) NOT NULL DEFAULT '',
+  `page_is_redirect` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `page_is_new` tinyint(1) unsigned NOT NULL DEFAULT 0,
+  `page_random` double unsigned NOT NULL DEFAULT 0,
+  `page_touched` binary(14) NOT NULL,
+  `page_links_updated` binary(14) DEFAULT NULL,
+  `page_latest` int(8) unsigned NOT NULL DEFAULT 0,
+  `page_len` int(8) unsigned NOT NULL DEFAULT 0,
+  `page_content_model` varbinary(32) DEFAULT NULL,
+  `page_lang` varbinary(35) DEFAULT NULL,
+  PRIMARY KEY (`page_id`),
+  UNIQUE KEY `page_name_title` (`page_namespace`,`page_title`),
+  KEY `page_random` (`page_random`),
+  KEY `page_len` (`page_len`),
+  KEY `page_redirect_namespace_len` (`page_is_redirect`,`page_namespace`,`page_len`)
+) ENGINE=InnoDB AUTO_INCREMENT=80605254 DEFAULT CHARSET=binary ROW_FORMAT=COMPRESSED;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `page`
+--
+
+/*!40000 ALTER TABLE `page` DISABLE KEYS */;
+```
+
+Line 52 was the first `INSERT` statement with a whole bunch of records on one line, which looked something like this:
+
+```sql
+INSERT INTO `page` VALUES (10,0,'AccessibleComputing',1,0,0.856935107283,'20250625155329','20250721164418',1219062925,111,'wikitext',NULL),(12,0,'Anarchism',0,0,0.786172332974311,'20250802165215','20250802165337',1303243657,113084,'wikitext',NULL),(13,0,'AfghanistanHistory',1,0,0.154661929211,'20250728113129','20250721164418',783865149,90,'wikitext',NULL),(14,0,'AfghanistanGeography',1,0,0.489002908649,'20250709154058','20250721164418',783865160,92,'wikitext',NULL),(15,0,'AfghanistanPeople',1,0,0.688188957925,'20250630214053','20250721164418',783865293,95,'wikitext',NULL),(18,0,'AfghanistanCommunications',1,0,0.57066921872,'20250625155329','20250721164418',783865299,97,'wikitext',NULL),(19,0,'AfghanistanTransportations',1,0,0.674272520164282,'20250625155329','20250721164418',783821589,113,'wikitext',NULL),(20,0,'AfghanistanMilitary',1,0,0.891502783885,'20250709140735','20250721164418',1299628675,123,'wikitext',NULL),(21,0,'AfghanistanTransnationalIssues',1,0,0.497601877453,'20250727233343','20250721164418',783821743,101,'wikitext',NULL),(23,0,'AssistiveTechnology',1,0,0.813051030928,'20250728011354','20250721164418',783865310,88,'wikitext',NULL),...
+```
+
+So many rows in one `INSERT` statement. I can get an idea how many records there are by counting up the number of close parenthesis that are followed by either a comma or a semicolon (indicating the end of a record).
+
+```bash
+> tail -n +51 enwiki-latest-page.sql | grep -oE '\)[,|;]' | wc -l
+
+63657595
+```
+
+So just over 63 million records. At the time of writing, [Wikipedia:Size of Wikipedia](https://en.wikipedia.org/wiki/Wikipedia:Size_of_Wikipedia) states Wikipedia contains a grand total of 63,841,479 pages, with only 11% of those being articles. So in order to speed up the process of importing this database, I need to remove all records that don't correspond to articles in the `geotags` table. To do this, I can print out a list of all page IDs present in the `geotags` article. Then, I can iterate through every line of `enwiki-latest-page.sql`, extracting every record, and discarding it if it isn't a page we care about. 
+
+Firstly, to get all IDs, I can do
+
+```bash
+sudo mysql -e "SELECT gt_page_id FROM geo_tags WHERE gt_primary = 1 AND gt_globe = 'earth';" wikipedia > ids.txt
+```
+
+Then I began working on the script. The first part opens up the file for reading, loads the geotagged article IDs into a set, and compiles a regex pattern to extract the page ID out of a record.
+
+```py
+bigFile = open('enwiki-latest-page.sql')
+
+pattern: re.Pattern = re.compile(r'^(\d+),')	
+with open('ids.txt', 'r', encoding='utf-8') as file:
+	geotaggedIDs: set = set([l.strip() for l in file.readlines()])
+```
+
+Next, I looped through every single line of `enwiki-latest-page.sql`, splitting it into an array of records. For each record, I extracted the page ID with the regex from before. If this page ID was present in the set of geotagged articles, keep it. 
+
+```py
+# filter out the articles that arent in geotags
+i: int = 0
+line: str = "aaaaa"
+validTokens: list[str] = []
+while line:
+	line = bigFile.readline()
+	i += 1
+
+	if i <= 51: continue # skip the 51 line header
+		
+	line = line[27:] # remove the INSERT INTO stuff and first open parenthesis
+	line = line[:-3] # remove the );\n at the end
+	tokens: list[str] = line.split('),(')
+	for t in tokens:
+		match: re.Match|None = pattern.match(t)
+		if not match: continue
+
+		id: str = match.groups(0)[0] # type: ignore
+		if id in geotaggedIDs:
+			validTokens.append(t)
+```
+
+Finally, I wrote the valid records to a file, with 5000 records for every `INSERT` statement .
+
+```py
+# write to file
+BATCH_SIZE: int = 5000
+with open('filteredDB.sql', 'w', encoding='utf-8') as file:
+	file.write(FILE_HEADER)
+	file.write('\n')
+	data: str = "INSERT INTO `page` VALUES "
+	for i, row in enumerate(validTokens):
+		data += '(' + row + '),'
+
+		if i % BATCH_SIZE == 0:
+			file.write(data[:-1] + ';\n')
+			data = "INSERT INTO `page` VALUES "
+```
+
+
