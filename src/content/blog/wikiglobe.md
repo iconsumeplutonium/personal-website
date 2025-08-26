@@ -1,7 +1,7 @@
 ---
 title: 'From the makings of WikiGlobe'
 date: '08-20-2025'
-description: tbd
+description: Lessons and discoveries from building WikiGlobe
 ---
 
 So the idea behind the project is pretty simple. Every Wikipedia article about a location has its geographic coordinates on it. I wanted to grab every single one of those articles, and project it onto a globe, and see what I can get. Sounds simple enough. How hard can it be? This blog post (my first ever btw!) is meant to be a record of that process, showing what worked, what didn't, and what I learned along the way.
