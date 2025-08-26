@@ -4,11 +4,11 @@ date: '08-20-2025'
 description: tbd
 ---
 
-So the idea behind the project is pretty simple. Every Wikipedia article about a location has its geographic coordinates on it. I wanted to grab every single one of those articles, and project it onto a globe, and see what I can get. Sounds simple enough. How hard can it be? 
+So the idea behind the project is pretty simple. Every Wikipedia article about a location has its geographic coordinates on it. I wanted to grab every single one of those articles, and project it onto a globe, and see what I can get. Sounds simple enough. How hard can it be? This blog post (my first ever btw!) is meant to be a record of that process, showing what worked, what didn't, and what I learned along the way.
 
 ### The Wikipedia API
  
-Wikipedia, like most online wikis, uses [MediaWiki](https://www.mediawiki.org/wiki/MediaWiki) as their underlying software, which has an [API](https://www.mediawiki.org/wiki/API), so my first thought was to query it. With a bit of digging, I found that there is a [`&prop=coordinates` parameter](https://www.mediawiki.org/wiki/Extension:GeoData#prop=coordinates) that can be passed to the API to get the coordinates for a specified article. So the query string to get the coordinates for a given article is 
+My first thought when I started was to query Wikipedia's own API. Like most online wikis, Wikipedia uses [MediaWiki](https://www.mediawiki.org/wiki/MediaWiki) as its underlying software, which has a pretty extensive [API](https://www.mediawiki.org/wiki/API) for pulling structured data. After digging through the documentation, I found the [`&prop=coordinates` parameter](https://www.mediawiki.org/wiki/Extension:GeoData#prop=coordinates), which can be passed to the API to get the coordinates for a specified article. So a basic query to get the coordinates for a given article is 
 
 ```
 /api.php ?action=query &prop=coordinates &format=json &titles=[article titles]
@@ -17,7 +17,7 @@ Wikipedia, like most online wikis, uses [MediaWiki](https://www.mediawiki.org/wi
 
 For instance, [this](https://en.wikipedia.org/w/api.php?action=query&prop=coordinates&format=json&titles=Big%20Ben) is the API call to get the coordinates of the Big Ben article.
 
-So now that I know how to get the coordinates of a given article, I needed a way to get *all* articles with coordinates. Wikipedia has all sorts of [categories](https://en.wikipedia.org/wiki/Wikipedia:Contents/Categories) to group different types of articles by topic, from general categories like History and Technology, to really specific categories, like [Category:All Articles with unsourced statements](https://en.wikipedia.org/wiki/Category:All_articles_with_unsourced_statements), or [Category:Protected areas of California without parameters](https://en.wikipedia.org/wiki/Category:Protected_areas_of_California_articles_without_parameters). You can view what categories an article belongs to by going to `Tools > Page Information`, so I opened up a random article about a location and read through all the categories until I found what I was looking for: [Category:Coordinates on WikiData](https://en.wikipedia.org/wiki/Category:Coordinates_on_Wikidata). Now, using another MediaWiki API call, I could extract a list of all category members and their titles using the [generator prop](https://www.mediawiki.org/wiki/API:Query#:~:text=Get%20the%20list%20of%20pages%20to%20work%20on%20by%20executing%20the%20specified%20query%20module). The query string is as follows:
+So now that I know how to get the coordinates of a given article, I needed a way to get *all* articles with coordinates. Wikipedia has all sorts of [categories](https://en.wikipedia.org/wiki/Wikipedia:Contents/Categories) to group different types of articles by topic, from general categories like History and Technology, to really specific categories, like [Category:All Articles with unsourced statements](https://en.wikipedia.org/wiki/Category:All_articles_with_unsourced_statements), or [Category:Wikipedia articles needing clarification from March 2023](https://en.wikipedia.org/wiki/Category:Wikipedia_articles_needing_clarification_from_March_2023). Every article lists what categories it belongs to (you can see them under `Tools > Page information`), so I opened up a random location article and browsed through until I found what I was looking for: [Category:Coordinates on WikiData](https://en.wikipedia.org/wiki/Category:Coordinates_on_Wikidata). Now, using another MediaWiki API call, I could extract a list of all category members and their titles using the [generator prop](https://www.mediawiki.org/wiki/API:Query#:~:text=Get%20the%20list%20of%20pages%20to%20work%20on%20by%20executing%20the%20specified%20query%20module). The query string is as follows:
 
 ```
 api.php ?action=query &generator=categorymembers &gcmtitle=Category:Coordinates_on_Wikidata &gcmlimit=max &prop=coordinates &format=json
@@ -32,7 +32,7 @@ which returns [this](https://en.wikipedia.org/w/api.php?action=query&generator=c
 
 Beautiful. 
 
-Now one thing to note about MediaWiki API calls is that if the response is too large, it'll *paginate* the API. Essentially, if the `cocontinue` parameter is part of the response, then that's the API telling us, "hey, there's more data to be returned in response to your query". To get the next batch of results, you simply take the previous query and adding `&cocontinue=[whatever the API returned]` to the end. The amount of results returned per batch is determined by the `&gcmlimit=` parameter in the URL, which I set to `max`, or 500 results at a time. Hmm, I wonder how many articles are part of the "Coordinates on WikiData" article?
+Now one thing to note about MediaWiki API calls is that if the response is too large, it'll *paginate* the API. Essentially, if the `cocontinue` parameter is part of the response, then that's the API telling us, "hey, there's more data to be returned in response to your query". To get the next batch of results, you simply take the previous query and add `&cocontinue=[whatever the API returned]` to the end. The amount of results returned per batch is determined by the `&gcmlimit=` parameter in the URL, which I set to `max`, or 500 results at a time. Hmm, I wonder how many articles are part of the "Coordinates on WikiData" article?
 
 <div class="center">
   <img class="pro-img" src="/images/total_coordinates.png" alt="The total number of articles on the site" width="600px" height="auto" loading="lazy" decoding="async">
@@ -44,32 +44,32 @@ That means it'll take around 2,400 API calls to fully get every single article w
   <img class="pro-img" src="/images/first10.png" alt="Only the first 10 have APIs" width="600px" height="auto" loading="lazy" decoding="async">
 </div>
 
-For some reason, the generator prop only returns the coordinates *for the first 10 articles of the API response!* That means the amount of API calls needed to be made goes from 2,400 to over 120,000, which is unacceptably large and would probably get me IP banned from Wikipedia (and take hours to complete). I needed to find another way. I briefly experimented with [WikiData's Query Service](https://query.wikidata.org/), which lets you make SPARQL queries on Wikipedia's data. This also proved fruitless as the request would time out before completing (it is 1.2 million articles after all). I needed to find another way.
+For some reason, regardless of the total number of articles requested, the generator prop only returns the coordinates *for the first 10 articles!* That means the amount of API calls needed to be made goes from 2,400 to over 120,000, which is unacceptably large and would probably get me IP banned from Wikipedia (in addition to taking hours to complete). I needed to find another way. I briefly experimented with [WikiData's Query Service](https://query.wikidata.org/), which lets you make SPARQL queries on Wikipedia's data. This also proved fruitless as the request would time out before completing (it is 1.2 million articles after all). I needed to find another way.
 
 ### WikiData Dumps
 
 So if querying the specific data I needed over the network via an API is out of the question, my next idea was a real simple one: just download Wikipedia. 
 
-It's not actually as farfetched as it seems. Wikipedia provides ways to download all of their articles for offline access, and it isn't that much larger than a modern AAA video game. English Wikipedia with only text is 58GB, and around 100GB with all media ([source](https://en.wikipedia.org/wiki/Wikipedia:Statistics#Statistics_by_namespace)). I've even known a few people in real life who like to keep offline copies of Wikipedia on their device. Now the most common way to download Wikipedia is to use a program called [Kiwix](https://kiwix.org/en/). Once installed, you can download Wikipedia in one click, and use the software to browse it locally, just like you would in a web browser. After looking into this route, the main issue with that is that it doesn't download the articles as regular HTML files, it stores it as one very large 100GB file in the `.zim` file format, which I had never heard of. As I looked into it more, I discovered that Wikipedia also provides its data in SQL and XML formats [here](https://dumps.wikimedia.org/enwiki/) ([source](https://en.wikipedia.org/wiki/Wikipedia:Database_download#Where_do_I_get_the_dumps?)). This was a very useful discovery, as now I could simply run SQL queries against the database to get the data I needed, without downloading articles that I didn't care about.
+It's not actually as farfetched as it seems. Wikipedia provides ways to download all of their articles for offline access, and it isn't that much larger than a modern AAA video game. English Wikipedia with only text is 58GB, and around 100GB with all media[^1]. The most common way to download Wikipedia is to use a program called [Kiwix](https://kiwix.org/en/). Once installed, you can download Wikipedia in one click, and use the Kiwix software to browse it locally, just like you would in a web browser. After looking into this route, the main issue with it is that it doesn't download the articles as regular HTML files, it stores it as one very large 100GB file in the `.zim` file format, which I had never heard of. There do seem to be ways to turn `.zim` files back into HTML files, but that seemed like a lot of work, so I kept looking. As I looked into it more, I discovered that Wikipedia also provides its data in SQL and XML formats [here](https://dumps.wikimedia.org/enwiki/latest/). This was a very useful discovery, as now I could simply run SQL queries against the database to get the data I needed, without downloading data that I didn't care about.
 
 There is a *lot* of data on that page, but there are only two that I need. Specifically `enwiki-latest-page.sql.gz` (which contains things like the page title and ID) and `enwiki-latest-geo_tags.sql.gz` (which contains page ID, latitude, and longitude data). The former is 2.3GB compressed and 7GB uncompressed, while the latter is 50MB compressed and 262MB when uncompressed. A significant improvement over the 100GB from before!
 
 Now after downloading and unzipping the data, I began the process of importing both into MariaDB. I first decided to start with `enwiki-latest-page.sql`.
 
-```
+```bash
 sudo mysql -u root -p -e "CREATE DATABASE wikipedia;"
 sudo mysql -u root -p wikipedia < enwiki-latest-page.sql
 ```
 
 After I ran the second command, it just hung. Opening another terminal window and running 
 
-```
+```bash
 sudo mysql -e "SHOW PROCESSLIST;"
 ```
 
-I could see that it was slowly importing each page, so I decided to leave and wait. Now after about 4 hours of waiting, it had only gotten around to importing the page with the page ID of around 19,000,000. A query to the Wikipedia API told me that the highest page ID on the site was over 60,000,000. I didn't want to wait around that long, so I decided to cancel the import and I turned my focus to `enwiki-latest-geo_tags.sql`.
+I could see that it was, in fact, importing each page but very, very slowly; I decided to leave it running and wait. Now after about 4 hours of waiting, it had only gotten around to importing the page with the page ID of around 19,000,000, according to `SHOW PROCESSLIST`. A query to the Wikipedia API told me that the highest page ID on the site was over 60,000,000. I didn't want to wait around that long, so I decided to give up on that file for now and cancel the import, so I could turn my focus to `enwiki-latest-geo_tags.sql`.
 
-```
+```bash
 sudo mysql -u root -p -e "DROP DATABASE wikipedia;"
 sudo mysql -u root -p -e "CREATE DATABASE wikipedia;"
 sudo mysql -u root -p wikipedia < enwiki-latest-geo_tags.sql
@@ -118,7 +118,7 @@ MariaDB [wikipedia]> DESCRIBE geo_tags;
 13 rows in set (0.001 sec)
 ```
 
-This seems promising. According to the Category page from earlier, there are around 1.2 million articles with coordinates. Let's first test to make sure that there are 1.2 million articles here.
+This seems promising. According to the Category page from earlier, there are around 1.2 million articles with coordinates. Let me first test to make sure that there are 1.2 million articles here.
 
 ```sql
 MariaDB [wikipedia]> SELECT COUNT(*) FROM geo_tags;
@@ -154,7 +154,7 @@ MariaDB [wikipedia]> SELECT gt_page_id,gt_lat,gt_lon FROM geo_tags WHERE gt_page
 5 rows in set (0.000 sec)
 ```
 
-So as it turns out each article can have *multiple* sets of coordinates associated with it. Visiting article 303, which is the Wikipedia page for [Alabama](https://en.wikipedia.org/wiki/Alabama), there is only one set of coordinates in the top right of the article, which means clearly there must be some way to distinguish the main set of coordinates. Looking at the schema again, there's an attribute called `gt_primary` that can never be null. That seems promising. Let's try that. 
+So as it turns out each article can have *multiple* sets of coordinates associated with it. Visiting article 303, which is the Wikipedia page for [Alabama](https://en.wikipedia.org/wiki/Alabama), there is only one set of coordinates in the top right of the article, which means clearly there must be some way to distinguish the main set of coordinates. Looking at the schema again, there's an attribute called `gt_primary` that can never be null. That seems promising. Let me try that. 
 
 ```sql
 MariaDB [wikipedia]> SELECT gt_page_id,gt_lat,gt_lon,gt_primary FROM geo_tags WHERE gt_page_id = 303;
@@ -192,7 +192,7 @@ sudo mysql -e "SELECT gt_page_id,gt_lat,gt_lon FROM geo_tags WHERE gt_primary = 
 
 ### Projecting to a Globe
 
-To render the points in my browser, I'll be using Three.js (using WebGL would be pretty fun, but I don't want to go through the process of implementing my own orbit controls). Latitude and longitude are angles, and we need to convert them to a position in 3D space, so we can use the formula for converting spherical coordinates into Cartesian coordinates, using latitude as $\theta$, longitude as $\phi$, and any arbitrary value for the radius. In the code, that looks something like this.
+To render the points in my browser, I'll be using Three.js (using raw WebGL would be pretty fun, but I don't want to go through the process of implementing my own orbit controls). Latitude and longitude are angles, and I need to convert them to a position in 3D space, so I can use the formula for converting spherical coordinates into Cartesian coordinates, using latitude as $\theta$, longitude as $\phi$, and any arbitrary value for the radius. In the code, that looks something like this.
 
 ```js
 for (let i = 0; i < numRowsInCoordinateData; i++) {
@@ -208,7 +208,7 @@ for (let i = 0; i < numRowsInCoordinateData; i++) {
 }
 ```
 
-After running that, we end up with this:
+After running that, I ended up with this:
 
 <div class="center">
   <img class="pro-img" src="/images/messedupprojection.png" alt="Half-hemisphere of points, all messed up" width="600px" height="auto" loading="lazy" decoding="async">
@@ -217,7 +217,22 @@ After running that, we end up with this:
   <img class="pro-img" src="/images/messedupprojection_topview.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
 </div>
 
-The points near the poles are heavily distorted, and there is only one hemisphere of points. A bit of googling led me to [this](https://stackoverflow.com/a/1185413) Stack Overflow post with the correct formula. At the time, I didn't understand why this worked and just blindy followed it, but during the process of writing this post, I decided to go back and try to understand it. If you're interested, you can read the following addendum for an explanation, or skip ahead to see it working.
+The points near the poles are heavily distorted, and there is only one hemisphere of points. A bit of googling led me to [this](https://stackoverflow.com/a/1185413) Stack Overflow post with the correct formula:
+
+
+$$
+x = r \cos(\theta) \cos(\phi)
+$$
+
+$$
+y = r \cos(\theta) \sin(\phi)
+$$
+
+$$
+z = r \sin(\theta)
+$$
+
+ At the time, I didn't understand why this worked and just blindy followed it, but during the process of writing this post, I decided to go back and try to understand it. If you're interested, you can read the following addendum for an explanation, or skip ahead to see it working.
 
 
 
@@ -232,7 +247,15 @@ The points near the poles are heavily distorted, and there is only one hemispher
 
 Here is my tenuous understanding of how this works, I'm not quite sure how correct this is.
 
-In spherical coordinates, $\theta$ goes from $0$ at the "north pole" to $\pi$ at the "south pole", but latitude is measured from to 90° at the North pole ($\frac{\pi}{2}$) to -90° at the South Pole (-$\frac{\pi}{2}$). So in other words, we need to map the range $[\frac{\pi}{2}, -\frac{\pi}{2}]$ to $[0, \pi]$. To do so, we can use the formula
+In spherical coordinates, $\theta$ goes from $0$ at the "north pole" to $\pi$ at the "south pole", but latitude is measured from to 90° at the North pole ($\frac{\pi}{2}$) to -90° at the South Pole (-$\frac{\pi}{2}$). 
+
+<div class="center">
+  <img class="pro-img" src="/images/thetaexplanation.png" alt="Half-hemisphere of points, all messed up, top view" width="300px" height="auto" loading="lazy" decoding="async">
+</div>
+
+
+
+So in other words, we need to map the range $[\frac{\pi}{2}, -\frac{\pi}{2}]$ to $[0, \pi]$. To do so, we can use the formula
 
 $$
 \theta = \frac{\pi}{2} - \text{latitude}
@@ -241,11 +264,16 @@ $$
 Testing it out, it indeed maps $[\frac{\pi}{2}, -\frac{\pi}{2}]$ to $[0, \pi]$
 
 $$
-\text{North pole} \Rightarrow \frac{\pi}{2} - \frac{\pi}{2} = 0
-$$
+\begin{array}{c|c|}
+	\text{Location} & \text{Latitude} & \theta = \tfrac{\pi}{2} - \text{lat} \\
+	\hline
+	\text{North Pole} &  \tfrac{\pi}{2}  & 0                 \\
+	\hline
+	\text{Equator}    &        0         & \tfrac{\pi}{2}    \\
+	\hline
+	\text{South Pole} &  -\tfrac{\pi}{2} & \pi               \\
 
-$$
-\text{South pole} \Rightarrow \frac{\pi}{2} - (-\frac{\pi}{2}) = \pi
+\end{array}
 $$
 
 Substituting this new formula into the code, we now get this:
@@ -577,7 +605,7 @@ So many rows in one `INSERT` statement. I can get an idea how many records there
 63657595
 ```
 
-So just over 63 million records. At the time of writing, [Wikipedia:Size of Wikipedia](https://en.wikipedia.org/wiki/Wikipedia:Size_of_Wikipedia) states Wikipedia contains a grand total of 63,841,479 pages, with only 11% of those being articles. So in order to speed up the process of importing this database, I need to remove all records that don't correspond to articles in the `geotags` table. To do this, I can print out a list of all page IDs present in the `geotags` article. Then, I can iterate through every line of `enwiki-latest-page.sql`, extracting every record, and discarding it if it isn't a page we care about. 
+So just over 63 million records. At the time of writing, [Wikipedia:Size of Wikipedia](https://en.wikipedia.org/wiki/Wikipedia:Size_of_Wikipedia) states Wikipedia contains a grand total of 63,841,479 pages, with only 11% of those being articles. So in order to speed up the process of importing this database, I need to remove all records that don't correspond to articles in the `geotags` table. To do this, I can print out a list of all page IDs present in the `geotags` article. Then, I can iterate through every line of `enwiki-latest-page.sql`, extracting every record, and discarding it if it isn't a page I care about. 
 
 Firstly, to get all IDs, I can do
 
@@ -637,7 +665,7 @@ with open('filteredDB.sql', 'w', encoding='utf-8') as file:
 			data = "INSERT INTO `page` VALUES "
 ```
 
-Now after running it, we're left with a file with only 1.2 million records.
+Now after running it, I'm left with a file with only 1.2 million records.
 
 ```bash
 > cat filteredDB.sql | grep -oE '\)[,|;]' | wc -l
@@ -657,4 +685,14 @@ WHERE
 ```
 
 Leaving us with a text file containing 1,227,760 articles. Now when this gets rendered, all non-article pages (like that one User sandbox article at 0°N 90°W) are gone. 
+
+
+
+
+
+
+
+
+
+[^1]: https://en.wikipedia.org/wiki/Wikipedia:Statistics#Statistics_by_namespace
 

@@ -13,5 +13,7 @@ const { frontmatter } = Astro.props;
             <span class="badge badge--item">PUBLISHED</span>{frontmatter.date}
         </li>
     </ul>
-    <slot />
+    <div class="blog-content">
+        <slot />
+    </div>
 </BaseLayout>

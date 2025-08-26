@@ -45,5 +45,22 @@ const { pageTitle } = Astro.props;
             <!-- <Footer /> -->
         </main>
 	</body>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			// Get all anchor tags
+			const links = document.querySelectorAll('a[href]');
+			
+			links.forEach(link => {
+				// Only apply to external links (optional)
+				if (link.href.startsWith('http') && !link.href.includes(window.location.hostname)) {
+					link.setAttribute('target', '_blank');
+					link.setAttribute('rel', 'noopener noreferrer');
+				}
+				// Or apply to ALL links (uncomment the line below and comment the above)
+				// link.setAttribute('target', '_blank');
+			});
+		});
+	</script>
 </html>
 

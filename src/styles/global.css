@@ -43,6 +43,9 @@ h2 {
 
 h3 {
 	font-size: 1.6rem;
+	/* text-decoration: underline var(--underline);
+	text-decoration-thickness: 3px;
+	text-underline-offset: 6px; */
 }
 
 p {
@@ -449,6 +452,11 @@ summary::before {
 	flex-direction: 
 	row; gap: 0.25rem;
 }
+
+/* .blog-content p { 
+	font-family: 'Verdana', 'Times New Roman';
+} */
+
 
 
 /* Media Query */
