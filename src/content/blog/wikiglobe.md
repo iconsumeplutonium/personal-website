@@ -27,7 +27,7 @@ which returns [this](https://en.wikipedia.org/w/api.php?action=query&generator=c
 
 
 <div class="center">
-  <img class="pro-img" src="/images/categoryapicall.png" alt="The results of the API call" width="300px" height="auto" loading="lazy" decoding="async">
+  <img class="pro-img" src="/images/blog/wikiglobe/categoryapicall.png" alt="The results of the API call" width="300px" height="auto" loading="lazy" decoding="async">
 </div>
 
 Beautiful. 
@@ -35,13 +35,13 @@ Beautiful.
 Now one thing to note about MediaWiki API calls is that if the response is too large, it'll *paginate* the API. Essentially, if the `cocontinue` parameter is part of the response, then that's the API telling us, "hey, there's more data to be returned in response to your query". To get the next batch of results, you simply take the previous query and add `&cocontinue=[whatever the API returned]` to the end. The amount of results returned per batch is determined by the `&gcmlimit=` parameter in the URL, which I set to `max`, or 500 results at a time. Hmm, I wonder how many articles are part of the "Coordinates on WikiData" article?
 
 <div class="center">
-  <img class="pro-img" src="/images/total_coordinates.png" alt="The total number of articles on the site" width="600px" height="auto" loading="lazy" decoding="async">
+  <img class="pro-img" src="/images/blog/wikiglobe/total_coordinates.png" alt="The total number of articles on the site" width="600px" height="auto" loading="lazy" decoding="async">
 </div>
 
 That means it'll take around 2,400 API calls to fully get every single article with its coordinates. Not ideal at all, but probably better than webscraping all 1.2 million articles, so I decided to go ahead with it anyways. But, wait a minute, what's this?
 
 <div class="center">
-  <img class="pro-img" src="/images/first10.png" alt="Only the first 10 have APIs" width="600px" height="auto" loading="lazy" decoding="async">
+  <img class="pro-img" src="/images/blog/wikiglobe/first10.png" alt="Only the first 10 have APIs" width="600px" height="auto" loading="lazy" decoding="async">
 </div>
 
 For some reason, regardless of the total number of articles requested, the generator prop only returns the coordinates *for the first 10 articles!* That means the amount of API calls needed to be made goes from 2,400 to over 120,000, which is unacceptably large and would probably get me IP banned from Wikipedia (in addition to taking hours to complete). I needed to find another way. I briefly experimented with [WikiData's Query Service](https://query.wikidata.org/), which lets you make SPARQL queries on Wikipedia's data. This also proved fruitless as the request would time out before completing (it is 1.2 million articles after all). I needed to find another way.
@@ -211,10 +211,10 @@ for (let i = 0; i < numRowsInCoordinateData; i++) {
 After running that, I ended up with this:
 
 <div class="center">
-  <img class="pro-img" src="/images/messedupprojection.png" alt="Half-hemisphere of points, all messed up" width="600px" height="auto" loading="lazy" decoding="async">
+  <img class="pro-img" src="/images/blog/wikiglobe/messedupprojection.png" alt="Half-hemisphere of points, all messed up" width="600px" height="auto" loading="lazy" decoding="async">
 </div>
 <div class="center">
-  <img class="pro-img" src="/images/messedupprojection_topview.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
+  <img class="pro-img" src="/images/blog/wikiglobe/messedupprojection_topview.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
 </div>
 
 The points near the poles are heavily distorted, and there is only one hemisphere of points. A bit of googling led me to [this](https://stackoverflow.com/a/1185413) Stack Overflow post with the correct formula:
@@ -250,7 +250,7 @@ Here is my tenuous understanding of how this works, I'm not quite sure how corre
 In spherical coordinates, $\theta$ goes from $0$ at the "north pole" to $\pi$ at the "south pole", but latitude is measured from to 90° at the North pole ($\frac{\pi}{2}$) to -90° at the South Pole (-$\frac{\pi}{2}$). 
 
 <div class="center">
-  <img class="pro-img" src="/images/thetaexplanation.png" alt="Half-hemisphere of points, all messed up, top view" width="300px" height="auto" loading="lazy" decoding="async">
+  <img class="pro-img" src="/images/blog/wikiglobe/thetaexplanation.png" alt="Half-hemisphere of points, all messed up, top view" width="300px" height="auto" loading="lazy" decoding="async">
 </div>
 
 
@@ -320,7 +320,7 @@ which corroborates that Stack Overflow post from earlier. Nice.
 
 
 <div class="center">
-  <img class="pro-img" src="/images/correctglobe_seethrough.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
+  <img class="pro-img" src="/images/blog/wikiglobe/correctglobe_seethrough.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
 </div>
 
 Its hard to see in the image, but after plugging in the updated formula the globe is now correct. and you can see the shape of the continents. Applying a custom shader to hide points that shouldn't be visible yields this:
@@ -328,7 +328,7 @@ Its hard to see in the image, but after plugging in the updated formula the glob
 
 <div class="center">
 	<video width="600" height="auto" controls autoplay muted loop style="max-width: 100%">
-		<source src="/globe.mp4" type="video/mp4" />
+		<source src="/images/blog/wikiglobe/globe.mp4" type="video/mp4" />
 		Your browser does not support the video tag.
 	</video>
 </div>
@@ -345,7 +345,7 @@ processedCoords.push(v);
 ```
 
 <div class="center">
-  <img class="pro-img" src="/images/mercator.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
+  <img class="pro-img" src="/images/blog/wikiglobe/mercator.png" alt="Half-hemisphere of points, all messed up, top view" width="600px" height="auto" loading="lazy" decoding="async">
 </div>
 
 
