@@ -6,7 +6,7 @@ description: tbd
 
 So the idea behind the project is pretty simple. Every Wikipedia article about a location has its geographic coordinates on it. I wanted to grab every single one of those articles, and project it onto a globe, and see what I can get. Sounds simple enough. How hard can it be? This blog post (my first ever btw!) is meant to be a record of that process, showing what worked, what didn't, and what I learned along the way.
 
-### The Wikipedia API
+## The Wikipedia API
  
 My first thought when I started was to query Wikipedia's own API. Like most online wikis, Wikipedia uses [MediaWiki](https://www.mediawiki.org/wiki/MediaWiki) as its underlying software, which has a pretty extensive [API](https://www.mediawiki.org/wiki/API) for pulling structured data. After digging through the documentation, I found the [`&prop=coordinates` parameter](https://www.mediawiki.org/wiki/Extension:GeoData#prop=coordinates), which can be passed to the API to get the coordinates for a specified article. So a basic query to get the coordinates for a given article is 
 
@@ -46,7 +46,7 @@ That means it'll take around 2,400 API calls to fully get every single article w
 
 For some reason, regardless of the total number of articles requested, the generator prop only returns the coordinates *for the first 10 articles!* That means the amount of API calls needed to be made goes from 2,400 to over 120,000, which is unacceptably large and would probably get me IP banned from Wikipedia (in addition to taking hours to complete). I needed to find another way. I briefly experimented with [WikiData's Query Service](https://query.wikidata.org/), which lets you make SPARQL queries on Wikipedia's data. This also proved fruitless as the request would time out before completing (it is 1.2 million articles after all). I needed to find another way.
 
-### WikiData Dumps
+## WikiData Dumps
 
 So if querying the specific data I needed over the network via an API is out of the question, my next idea was a real simple one: just download Wikipedia. 
 
@@ -190,7 +190,7 @@ Now to create the visualization, the three primary attributes I'm interested in 
 sudo mysql -e "SELECT gt_page_id,gt_lat,gt_lon FROM geo_tags WHERE gt_primary = 1;" wikipedia > coords.txt
 ```
 
-### Projecting to a Globe
+## Projecting to a Globe
 
 To render the points in my browser, I'll be using Three.js (using raw WebGL would be pretty fun, but I don't want to go through the process of implementing my own orbit controls). Latitude and longitude are angles, and I need to convert them to a position in 3D space, so I can use the formula for converting spherical coordinates into Cartesian coordinates, using latitude as $\theta$, longitude as $\phi$, and any arbitrary value for the radius. In the code, that looks something like this.
 
@@ -349,10 +349,14 @@ processedCoords.push(v);
 </div>
 
 
+
+
+
+
 <details>
 <summary>Interlude: gt_globe and other celestial bodies</summary>
 
-Now it was at this point that I got distracted and starting looking at the `enwiki-latest-geo_tags.sql` table from earlier and noticed that there was a column called `gt_globe` that could not be null, i.e. it must be present for every single set of coordinates. I ran it for the first 10 set of coordinates
+Now it was at this point that I got distracted and starting looking at the `enwiki-latest-geo_tags.sql` table from earlier again. I noticed that there was a column called `gt_globe` that could not be null, i.e. it must be present for every single set of coordinates. I ran it for the first 10 set of coordinates
 
 ```sql
 MariaDB [wikipedia]> select gt_globe from geo_tags limit 10;
@@ -465,20 +469,21 @@ MariaDB [wikipedia]> SELECT gt_globe,COUNT(*) FROM geo_tags GROUP BY gt_globe OR
 
 Huh. 
 
-I was curious as to what some of these bodies were, as I had never heard of any place named `test`. As it turns out, a lot of the celestial bodies don't have an associated article. Most of them are from page with an ID of 22123904 ([Template:Coord/testcases](https://en.wikipedia.org/?curid=22123904)) and 55067190 [(Wikipedia talk:Coordinates in infoboxes/Archive 2](https://en.wikipedia.org/?curid=55067190)). Filtering these two out gives us a better picture of the available coordinates (I'm sure there's more such articles, but I'll dig into that later).
+I was curious as to what some of these bodies were, as I had never heard of any place named `test`. As it turns out, a lot of the celestial bodies don't have an associated article. Most of them are from the page with ID 10118245 ([Template:Coord](https://en.wikipedia.org/wiki/Template:Coord)), 22123904 ([Template:Coord/testcases](https://en.wikipedia.org/?curid=22123904)), and 55067190 ([Wikipedia talk:Coordinates in infoboxes/Archive 2](https://en.wikipedia.org/?curid=55067190)). Filtering these three out gives us a better picture of the available coordinates (I'm sure there's more such articles, but I'll dig into that later).
 
 ```sql
-MariaDB [wikipedia]> SELECT gt_globe,COUNT(*) FROM geo_tags WHERE gt_page_id != 22123904 AND gt_page_id != 55067190 GROUP BY gt_globe ORDER BY COUNT(*) DESC;
+MariaDB [wikipedia]> SELECT gt_globe,COUNT(*) FROM geo_tags WHERE gt_page_id != 22123904 AND gt_page_id != 55067190 AND
+gt_page_id != 10118245 GROUP BY gt_globe ORDER BY COUNT(*) DESC;
 +-----------+----------+
 | gt_globe  | COUNT(*) |
 +-----------+----------+
-| earth     |  2663735 |
-| moon      |     4738 |
-| mars      |     3114 |
-| venus     |     1199 |
-| mercury   |      940 |
-| titan     |      445 |
-| ganymede  |      346 |
+| earth     |  2663700 |
+| moon      |     4737 |
+| mars      |     3113 |
+| venus     |     1198 |
+| mercury   |      939 |
+| titan     |      444 |
+| ganymede  |      345 |
 | callisto  |      300 |
 | io        |      300 |
 | vesta     |      295 |
@@ -498,14 +503,14 @@ MariaDB [wikipedia]> SELECT gt_globe,COUNT(*) FROM geo_tags WHERE gt_page_id != 
 | phoebe    |       50 |
 | ariel     |       48 |
 | ida       |       47 |
-| phobos    |       43 |
+| phobos    |       42 |
 | mimas     |       37 |
 | itokawa   |       37 |
 | oberon    |       31 |
 | umbriel   |       29 |
+| charon    |       23 |
 | steins    |       23 |
 | mathilde  |       23 |
-| charon    |       23 |
 | miranda   |       22 |
 | triton    |       22 |
 | hyperion  |       10 |
@@ -513,14 +518,14 @@ MariaDB [wikipedia]> SELECT gt_globe,COUNT(*) FROM geo_tags WHERE gt_page_id != 
 | jupiter   |        6 |
 | dactyl    |        4 |
 | proteus   |        2 |
-| marás     |        1 |
 | amalthea  |        1 |
 | thebe     |        1 |
+| marás     |        1 |
 +-----------+----------+
-44 rows in set (2.459 sec)
+44 rows in set (2.931 sec)
 ```
 
-insert something about gt_globe equals earth in future queries
+So in future queries, I'll have to include `AND gt_globe = 'earth'` to limit queries to this world only.
 
 </details>
 
@@ -529,11 +534,11 @@ insert something about gt_globe equals earth in future queries
 
 
 
-### Filtering out non-articles
+## Filtering out non-articles
 
-As I progressed through this project, I added the ability to click on points and view the associated Wikipedia article. This led to me discovering that there existed pages on Wikipedia that have geographic coordiantes, but aren't articles. For instance, I discovered a point at 0°N 90°W associated with [this](https://en.wikipedia.org/?curid=17458267) page, which appears to belong to a user. I needed a way to filter out all the points that weren't articles. Where would I get that information? Well, it turns out that information is back in `enwiki-latest-pages.sql`, that 7GB SQL file that wasn't even halfway done after 4 hours of importing. According to the [schema](https://www.mediawiki.org/wiki/Manual:Page_table#page_namespace), the `page_namespace` column would tell me if an page was an article or not. 
+As I progressed through this project, I added the ability to click on points and view the associated Wikipedia article. This led to me discovering that there existed pages on Wikipedia that have geographic coordiantes, but aren't articles. For instance, I discovered a point at 0°N 90°W associated with [this](https://en.wikipedia.org/?curid=17458267) page, which appears to belong to a user. I needed a way to filter out all the points that weren't articles. Where would I get that information? Well, it turns out that information is back in `enwiki-latest-pages.sql`, that 7GB SQL file that wasn't even halfway done after 4 hours of importing. According to the [schema](https://www.mediawiki.org/wiki/Manual:Page_table#page_namespace), the `page_namespace` column would tell me if an page was an article or not. I didn't want to wait hours to import that database, so I needed to find a way to import it faster.
 
-So I started to probe `enwiki-latest-pages.sql`. The first 51 lines of the file were metadata about the database the file creates and whatnot.
+I started by probing `enwiki-latest-pages.sql`. The first 51 lines of the file were metadata about the file itself, and the commands to set up the database.
 
 ```sql
 > head -51 enwiki-latest-page.sql
@@ -605,7 +610,7 @@ So many rows in one `INSERT` statement. I can get an idea how many records there
 63657595
 ```
 
-So just over 63 million records. At the time of writing, [Wikipedia:Size of Wikipedia](https://en.wikipedia.org/wiki/Wikipedia:Size_of_Wikipedia) states Wikipedia contains a grand total of 63,841,479 pages, with only 11% of those being articles. So in order to speed up the process of importing this database, I need to remove all records that don't correspond to articles in the `geotags` table. To do this, I can print out a list of all page IDs present in the `geotags` article. Then, I can iterate through every line of `enwiki-latest-page.sql`, extracting every record, and discarding it if it isn't a page I care about. 
+So just over 63 million records. At the time of writing, [Wikipedia:Size of Wikipedia](https://en.wikipedia.org/wiki/Wikipedia:Size_of_Wikipedia) states Wikipedia contains a grand total of 63,841,479 pages, with only 11% of those being articles. So in order to speed up the process of importing this database, I need to remove all records that don't correspond to articles in the `geo_tags` table. To do this, I can print out a list of all page IDs present in the `geo_tags` article. Then, I can iterate through every line of `enwiki-latest-page.sql`, extracting every record, and discarding it if it isn't one of the IDs from `geo_tags`. 
 
 Firstly, to get all IDs, I can do
 
@@ -643,7 +648,7 @@ while line:
 		match: re.Match|None = pattern.match(t)
 		if not match: continue
 
-		id: str = match.groups(0)[0] # type: ignore
+		id: str = match.groups(0)[0]
 		if id in geotaggedIDs:
 			validTokens.append(t)
 ```
@@ -672,7 +677,7 @@ Now after running it, I'm left with a file with only 1.2 million records.
 1241480
 ```
 
-Now when I try to import it into MariaDB, it only takes about 20 minutes (about the same time it took to import `enwiki-latest-geo_tags.sql`). Now finally, In order to get only pages that are geotagged articles, I can run this query:
+Now when I try to import it into MariaDB, it only takes about 20 minutes (about the same time it took to import `enwiki-latest-geo_tags.sql`). Finally, in order to get only pages that are proper geotagged articles, I can run this query:
 
 ```sql
 SELECT gt.gt_page_id, gt.gt_lat, gt.gt_lon FROM geo_tags gt 
@@ -687,7 +692,9 @@ WHERE
 Leaving us with a text file containing 1,227,760 articles. Now when this gets rendered, all non-article pages (like that one User sandbox article at 0°N 90°W) are gone. 
 
 
+## Conclusion
 
+The final version of the project is available at [wikiglobe.umairrizwan.com](https://wikiglobe.umairrizwan.com). There is still plenty of work to be done to improve the site (such as improving performance by chunking the data, highlighting the selected point, merging points that are close to each other, etc.). If I learn anything interesting from that, maybe I'll follow up with another blog post.
 
 
 

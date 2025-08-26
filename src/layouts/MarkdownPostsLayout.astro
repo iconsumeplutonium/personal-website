@@ -7,7 +7,7 @@ const { frontmatter } = Astro.props;
     <!-- <div class="gif">
         <img src="/images/blog.webp" role="presentation" width="300" height="259" decoding="async">
     </div> -->
-    <h2 style="text-decoration:none; text-decoration: underline var(--underline); text-decoration-thickness: 4px; underline-offset: 6px;">{frontmatter.title}</h2>
+    <h1 style="text-decoration:none; text-decoration: underline var(--underline); text-decoration-thickness: 4px; underline-offset: 6px;">{frontmatter.title}</h1>
     <ul class="badge__list">
         <li>
             <span class="badge badge--item">PUBLISHED</span>{frontmatter.date}
