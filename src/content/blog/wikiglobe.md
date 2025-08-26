@@ -1,6 +1,6 @@
 ---
 title: 'From the makings of WikiGlobe'
-date: '08-20-2025'
+date: '08-25-2025'
 description: Lessons and discoveries from building WikiGlobe
 ---
 
@@ -536,7 +536,7 @@ So in future queries, I'll have to include `AND gt_globe = 'earth'` to limit que
 
 ## Filtering out non-articles
 
-As I progressed through this project, I added the ability to click on points and view the associated Wikipedia article. This led to me discovering that there existed pages on Wikipedia that have geographic coordiantes, but aren't articles. For instance, I discovered a point at 0°N 90°W associated with [this](https://en.wikipedia.org/?curid=17458267) page, which appears to belong to a user. I needed a way to filter out all the points that weren't articles. Where would I get that information? Well, it turns out that information is back in `enwiki-latest-pages.sql`, that 7GB SQL file that wasn't even halfway done after 4 hours of importing. According to the [schema](https://www.mediawiki.org/wiki/Manual:Page_table#page_namespace), the `page_namespace` column would tell me if an page was an article or not. I didn't want to wait hours to import that database, so I needed to find a way to import it faster.
+As I progressed through this project, I added the ability to click on points and view the associated Wikipedia article. This led to me discovering that there existed pages on Wikipedia that have geographic coordinates, but aren't articles. For instance, I discovered a point at 0°N 90°W associated with [this](https://en.wikipedia.org/?curid=17458267) page, which appears to belong to a user. I needed a way to filter out all the points that weren't articles. Where would I get that information? Well, it turns out that information is back in `enwiki-latest-pages.sql`, that 7GB SQL file that wasn't even halfway done after 4 hours of importing. According to the [schema](https://www.mediawiki.org/wiki/Manual:Page_table#page_namespace), the `page_namespace` column would tell me if an page was an article or not. I didn't want to wait hours to import that database, so I needed to find a way to import it faster.
 
 I started by probing `enwiki-latest-pages.sql`. The first 51 lines of the file were metadata about the file itself, and the commands to set up the database.
 
