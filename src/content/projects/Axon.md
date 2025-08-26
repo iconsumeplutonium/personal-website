@@ -12,6 +12,6 @@ links:
     url: 'https://axon.thinkfluence.rs/'
   - name: 'Demo Video'
     url: 'https://youtu.be/JdRwhOcxzvc'
-order: 3
+order: 40
 year: 2024
 ---

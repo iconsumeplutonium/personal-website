@@ -12,6 +12,6 @@ links:
   - name: 'DevPost'
     url: 'https://devpost.com/software/slugcycle-8vh7dw'
 stack: React, TypeScript
-order: 7
+order: 80
 year: 2024
 ---

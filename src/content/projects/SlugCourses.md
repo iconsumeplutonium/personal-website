@@ -12,6 +12,6 @@ links:
   - name: 'Web Version'
     url: 'https://courses.thinkfluence.rs/'
 stack: Kotlin, Python, Gemini, SQL
-order: 2
+order: 20
 year: 2024
 ---
