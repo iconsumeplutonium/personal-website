@@ -9,8 +9,8 @@ links:
     url: 'https://github.com/prapooskur/SlugCourses'
   - name: 'DevPost'
     url: 'https://devpost.com/software/slug-courses'
-  - name: 'Web Version'
-    url: 'https://courses.thinkfluence.rs/'
+#   - name: 'Web Version'
+#     url: 'https://courses.thinkfluence.rs/'
 stack: Kotlin, Python, Gemini, SQL
 order: 20
 year: 2024

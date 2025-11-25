@@ -6,7 +6,7 @@ image:
   alt: 'Screenshot of the UCSC Info website'
 links:
   - name: 'GitHub'
-    url: 'https://github.com/Seanathan10/CruzHacks2025'
+    url: 'https://github.com/Seanathan10/UCSC-Info'
   - name: 'Website'
     url: 'https://www.ucscinfo.tech/'
   - name: 'DevPost'
