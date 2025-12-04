@@ -6,7 +6,7 @@ image:
   alt: 'Screenshot of the SlugCycle interface showing the maps and bike view'
 links:
   - name: 'GitHub'
-    url: 'https://github.com/Seanathan10/ACM2024'
+    url: 'https://github.com/Seanathan10/SlugCycle'
   - name: 'Website'
     url: 'https://slugcycle.vercel.app/'
   - name: 'DevPost'
