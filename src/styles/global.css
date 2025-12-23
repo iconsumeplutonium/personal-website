@@ -280,9 +280,9 @@ summary::before {
 	align-items: flex-start;
 }
 
-.card__link:hover {
+/* .card__link:hover {
 	transform: scale(1.05);
-}
+} */
 
 .card__img {
 	border-radius: 16px;
@@ -433,6 +433,7 @@ summary::before {
 
 .icon__link:hover {
 	border-color: var(--text-link);
+	cursor: pointer;
 }
 
 .git-icon {
